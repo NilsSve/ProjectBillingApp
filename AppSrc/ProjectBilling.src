@@ -504,8 +504,7 @@ Object oMain is a Panel
                 Set pbControlBeginGroup to True
 
                 Procedure OnExecute Variant vCommandBarControl
-                    Send Info_Box "To be done after GitHub publication..."
-//                    Runprogram Shell Background "https://github.com/NilsSve/ProjectBilling/issues/1"
+                    Runprogram Shell Background "https://github.com/NilsSve/ProjectBillingApp/issues/1"
                 End_Procedure
 
             End_Object
