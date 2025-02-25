@@ -1,7 +1,6 @@
 ## Application for Project Billing for consultants
 
-Made for e.g. programmer's that run their own shop. Makes it easy to register what has been done on a project and the time. What is really helpfull, is the facility to automatically create an invoice from a project, print the invoice to e.g. a PDF-file to email it to customer.
-
+This tool is designed for programmers who run their own businesses. It simplifies the process of tracking project progress and time spent on tasks. One of its most helpful features is the ability to automatically generate an invoice based on a project, which can then be printed as a PDF file for easy emailing to customers.
 ## Example
 
 Below is a sample image showcasing the `ProjectBilling.src` program:
