@@ -1,0 +1,636 @@
+﻿Use DfAllent.pkg
+Use cRDCCJCommandBarSystem.pkg
+
+Object oHtmlHelp is a cHtmlHelp
+End_Object
+
+Register_Function phoTabWorkspace Returns Handle
+
+Object oApplication is a cApplication 
+    Set peHelpType to htHtmlHelp 
+    Set psProgram  to "ProjectBilling"
+    Set psCompany  to "RDC Tools International"
+    Set psProduct  to "Consultancy Billing System"
+    
+    Property String psGridRowBackgroundColor
+    Property Integer piToolbarIconSize 32
+    Property Integer piProjectID -1 
+    Property Integer piInvoiceID -1 
+    Property Boolean pbHaveSavedSplitter False
+    
+    Procedure DoSaveEnvironment Handle hoContainer Boolean bProgram
+        Integer iSize iSizeLeft iSizeRight iLoc
+        Handle hoTab
+        Variant vTab 
+        
+        Forward Send DoSaveEnvironment hoContainer bProgram
+        If (pbHaveSavedSplitter(Self) = True) Begin
+            Procedure_Return
+        End
+        If (ghoCommandBars <> 0) Begin 
+            Get GuiClientSize of (Client_Id(phoMainPanel(Self))) to iSize
+            Get Create (RefClass(cCJTabWorkspace)) to hoTab
+            Get ComShowTabWorkspace of ghoCommandBars False to vTab
+            Set pvComObject of hoTab to vTab
+            Get ComGroupSplitter of hoTab 0 to iSizeLeft
+            If (iSizeLeft > 500) Begin
+                Move (iSizeLeft - 500) to iLoc
+                Send WriteDword "Preferences" "TabWorkspaceSplitterLoc" iLoc
+            End 
+            Set pbHaveSavedSplitter to True
+        End
+    End_Procedure
+    
+End_Object     
+
+Use cRDCTooltipController.pkg
+Object oToolTipController is a cRDCTooltipController
+End_Object
+
+Use oEditContextMenu.pkg
+Use oDEOEditContextMenu.pkg
+Use cRDCDbCJGrid.pkg
+
+Define CS_ThemeKeyWord for "Theme"
+Define CS_Settings     for "Settings"
+Define CS_GridFontSize for "GridFontSize"
+Define CS_TabPosition  for "TabPosition"
+
+Object oMain is a Panel
+    Set Label to "Consultancy Billing System"
+    Set Location to 4 3
+    Set Size to 300 724
+    Set Icon to "Invoice.ico"
+    
+    Object oCommandBarSystem is a cRDCCJCommandBarSystem
+        Set piLayoutBuild to 8
+        Set peRestoreLayout to rlSaveRestoreFullLayout
+
+        // Use this to customize
+        Procedure OnCreateTabbedWorkspace Handle hoTab Handle hoPaintManager
+            Integer iPosition
+            Variant vTab
+            
+            Get ComPosition of hoPaintManager to iPosition 
+            Get Create (RefClass(cCJTabWorkspace)) to hoTab
+            Get ComShowTabWorkspace True to vTab
+            Set pvComObject of hoTab to vTab        
+            Set ComFlags of hoTab to xtpWorkspaceHideArrowsAlways
+            Send ComEnableGroups of hoTab
+//            Set ComShowIcons of hoPaintManager to False
+        End_Procedure
+        
+        Object oMenuBar is a cCJMenuBar
+            
+            Object oFileMenu is a cCJMenuItem
+                
+                Set peControlType to xtpControlPopup          
+                Set psCaption   to "&File"
+                Set psDescription to "Find, Save, Delete, Clear information or quit this application."
+                Set psCategory to "Menus"
+    
+                Object oClearMenuItem is a cCJClearMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oClearAllMenu is a cCJClearAllMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oPromptMenuItem is a cCJPromptMenuItem
+                    Set pbAddToDesignerMenu to True
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+                Object oFindMenuItem is a cCJFindMenuItem
+                    Set pbAddToDesignerMenu to True
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+                Object oFindNextMenu is a cCJFindNextMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oFindPreviousMenu is a cCJFindPreviousMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oFindFirstMenu is a cCJFindFirstMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oFindLastMenu is a cCJFindLastMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oSaveMenuItem is a cCJSaveMenuItem
+                    Set pbAddToDesignerMenu to True
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+                Object oDeleteMenuItem is a cCJDeleteMenuItem
+                    Set pbAddToDesignerMenu to True
+                End_Object
+    
+                Object oExitMenu is a cCJExitMenuItem
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+            End_Object
+            
+            Object oViewMenu is a cCJMenuItem
+                Set peControlType to xtpControlPopup
+                Set psCaption to "&View"
+                Set psToolTip to "View"
+                Set psDescription to "Available Views"
+
+                Object oProjectMenuItem is a cCJMenuItem
+                    Set psCaption to "Project"
+                    Set psDescription to "Edit Project Hours"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Project.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oProjectView of hoClient
+                    End_Procedure
+                End_Object
+    
+                Object oInvoiceMenuItem is a cCJMenuItem
+                    Set psCaption to "Billing"
+                    Set psDescription to "Project Invoice/Billing"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Money.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oInvoiceEntryView of hoClient
+                    End_Procedure
+                End_Object
+
+                Object oCustomerEntryViewMenuItem is a cCJMenuItem
+                    Set psCaption to "Customers"
+                    Set psDescription to "Add, edit and delete Customer data."
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "CustomerSingle.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oCustomerView of hoClient
+                    End_Procedure
+                End_Object
+
+                Object oSysCompanyMenuItem is a cCJMenuItem
+                    Set psCaption to "Company"
+                    Set psDescription to "Info about your Company"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Company.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oSysCompany of hoClient
+                    End_Procedure
+                End_Object
+    
+                Object oInventoryItemViewMenuItem is a cCJMenuItem
+                    Set psCaption to "Inventory Items"
+                    Set psDescription to "Add, edit and delete Inventory data."
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Products.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oInventoryView of hoClient
+                    End_Procedure
+                End_Object
+
+                Object oMaintainCodesMenuItem is a cCJMenuItem
+                    Set psCaption to "Maintain Codes"
+                    Set psDescription to "Maintain Codes for Currencies and States"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Default.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oCodesMaintenance of hoClient
+                    End_Procedure
+                End_Object
+
+                Object oResetDatabaseMenuItem is a cCJMenuItem
+                    Set psCaption to "Remove Data"
+                    Set psDescription to "Remove DEMO data from tables"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "ActionDelete1.ico"
+                    Set pbControlBeginGroup to True
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oZeroFile_vw of hoClient
+                    End_Procedure
+                End_Object
+
+            End_Object
+            
+            Object oReportMenu is a cCJMenuItem
+                Set peControlType to xtpControlPopup
+                Set psCaption to "&Report"
+                Set psToolTip to "Report"
+                Set psDescription to "Available Reports"
+    
+                Object oHoursSpendonProjectReportMenuItem is a cCJMenuItem
+                    Set psCaption to "Project Report"
+                    Set psDescription to "Hours Spend on Project Report"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Project.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oProjectReportWP of hoClient
+                    End_Procedure
+                End_Object
+    
+                Object oInvoiceReportMenuItem is a cCJMenuItem
+                    Set psCaption to "Billing/Invoice"
+                    Set psDescription to "Print Invoice"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "Money.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oInvoiceReportWP of hoClient
+                    End_Procedure
+                End_Object
+
+                Object oCustomerListMenuItem2 is a cCJMenuItem
+                    Set psCaption to "Customers List"
+                    Set psDescription to "Print Customer data."
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "CustomerSingle.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_o1CustomerListWP of hoClient
+                    End_Procedure
+                End_Object
+    
+                Object oCustomerListMenuItem is a cCJMenuItem
+                    Set psCaption to "Customer List"
+                    Set psDescription to "Print Customer List as a text file"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "CustomerSingle.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oCustomerListBR of hoClient
+                    End_Procedure
+
+                End_Object
+
+                Object oImportCustomersMenuItem is a cCJMenuItem
+                    Set psCaption to "Import Customers"
+                    Set psDescription to "Import Customers from a text file"
+                    Set peControlStyle to xtpButtonCaptionAndDescription
+                    Set psImage to "CustomerImport.ico"
+                
+                    Procedure OnExecute Variant vCommandBarControl
+                        Handle hoClient
+                        Get Client_Id to hoClient
+                        Send Activate_oCustomerImport of hoClient
+                    End_Procedure
+
+                End_Object
+
+            End_Object
+                        
+            Object oNavigateMenu is a cCJMenuItem
+                Set peControlType to xtpControlPopup      
+                Set psCaption to "&Navigate"    
+                Set psTooltip to "Navigate"    
+                Set psDescription to "Move to different areas of the application"
+                
+                Object oNextAreaMenu is a cCJNextAreaMenu
+                End_Object
+                
+                Object oPriorAreaMenu is a cCJPriorAreaMenu
+                End_Object
+                
+                Object oNextViewMenu is a cCJNextViewMenu
+                End_Object
+                
+                Object oPriorViewMenu is a cCJPriorViewMenu
+                End_Object
+                
+                Object oPromptMenu is a cCJPromptMenuItem
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+                Object oZoomMenu is a cCJZoomMenuItem
+                End_Object
+    
+            End_Object
+    
+            Object oWindowMenu is a cCJMDIWindowsMenuItem
+                Set peControlType to xtpControlPopup      
+                Set psCaption to "&Window"
+                Set psToolTip to "Window"
+                Set psDescription to "Display Current Views and set other display options."    
+                
+                // These are the static windows items. More will be created in onInitPopup 
+                Object oDisplayOptionsMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup          
+                    Set psCaption to "&Display Options"
+                    Set psToolTip to "Display Options"
+                    Set psDescription to "Set display options"
+    
+                    Object oStatusbarMenu is a cCJStatusbarMenuItem
+                    End_Object
+    
+                End_Object
+        
+            End_Object
+            
+            Object oHelpMenu is a cCJMenuItem
+                Set peControlType to xtpControlPopup    
+                Set psCaption to "&Help"
+                Set psDescription to "Access Information for learning and using this DataFlex application."
+                Set psToolTip to "Help"
+                
+                Object oAboutMenuItem is a cCJAboutMenuItem
+                End_Object
+           
+                Object oKoFi_MenuItem is a cCJMenuItem
+                    Set psCaption to "Coffee Time!"
+                    Set psDescription to "Bye me a coffee, to support me"
+                    Set psImage to "Ko-fi.ico"
+                    Procedure OnExecute Variant vCommandBarControl
+                        Runprogram Shell Background "https://ko-fi.com/nilss"
+                    End_Procedure
+                End_Object
+    
+                Object oSuggestion_MenuItem is a cCJMenuItem
+                    Set psTooltip to "Suggestion"
+                    Set psDescription to "Suggest a feature, or report bugs..."
+                    Set psImage to "Suggestion.ico"
+    
+                    Procedure OnExecute Variant vCommandBarControl
+                        Send Info_Box "To be done after GitHub publication..."
+    //                    Runprogram Shell Background "https://github.com/NilsSve/ProjectBilling/issues"
+                    End_Procedure
+    
+                End_Object
+
+            End_Object
+    
+        End_Object
+    
+        Object oFindToolBar is a cCJToolbar
+            Set psTitle to "Finding Toolbar"
+    
+            Object oFindFirstTool is a cCJFindFirstMenuItem
+            End_Object
+    
+            Object oFindPreviousTool is a cCJFindPreviousMenuItem
+            End_Object
+    
+            Object oFindMenuTool is a cCJFindMenuItem
+            End_Object
+    
+            Object oFindNextTool is a cCJFindNextMenuItem
+            End_Object
+    
+            Object oFindLastTool is a cCJFindLastMenuItem
+            End_Object
+    
+            Object oPromptToolItem is a cCJPromptMenuItem
+                Set pbControlBeginGroup to True
+            End_Object
+    
+        End_Object
+            
+        Object oFileToolBar is a cCJToolbar
+            Set psTitle to "Data Entry Toolbar"
+    
+            Object oClearToolItem is a cCJClearMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+            
+            Object oClearAllToolItem2 is a cCJClearAllMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+                
+            Object oSaveToolItem is a cCJSaveMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+                Set pbControlBeginGroup to True
+            End_Object
+    
+            Object oDeleteToolItem is a cCJDeleteMenuItem   
+                Set psImage to "ActionDelete1.ico"
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+    
+        End_Object
+    
+        Object oEditToolBar is a cCJToolbar
+            Set psTitle to "Edit Toolbar"
+            Set peStretched to stStretchShared
+            
+            Object oCutToolbarItem is a cCJCutMenuItem
+            End_Object
+    
+            Object oCopyToolbarItem is a cCJCopyMenuItem
+            End_Object
+    
+            Object oPasteToolbarItem is a cCJPasteMenuItem
+            End_Object
+    
+            Object oDeleteEditToolbarItem is a cCJDeleteEditMenuItem
+                Set pbControlBeginGroup to True
+            End_Object
+        
+        End_Object
+        
+        Object oHelptoolBar is a cCJToolbar
+            Set psTitle to "Help Toolbar"
+            Set peStretched to stStretchShared
+            
+            Object oCalcMenuItem is a cCJMenuItem
+                Set psToolTip to "Calculator"
+                Set psDescription to "Start the Windows calculator app."
+                Set psImage to "Calc.ico"    
+
+                Procedure OnExecute Variant vCommandBarControl
+                    Runprogram Shell Background "Calc.exe" 
+                End_Procedure
+            End_Object
+
+            Object oAbout_MenuItem is a cCJMenuItem
+                Set psTooltip to C_$About
+                Set psDescription to C_$DescAbout
+                Set psImage to "ActionAbout.ico"
+                Set pbControlBeginGroup to True
+
+                Procedure OnExecute Variant vCommandBarControl
+                    Send Activate_About of (Client_Id(phoMainPanel(ghoApplication)))
+                End_Procedure
+
+            End_Object
+
+            Object oKoFi_MenuItem is a cCJMenuItem
+                Set psCaption to "Ko-fi"
+                Set psDescription to "Bye me a coffee"
+                Set psToolTip to "Bye me a coffee, to support me"
+                Set psImage to "Ko-fi.ico"
+                Set pbControlBeginGroup to True
+                Procedure OnExecute Variant vCommandBarControl
+                    Runprogram Shell Background "https://ko-fi.com/nilss"
+                End_Procedure
+            End_Object
+
+            Object oSuggestion_MenuItem is a cCJMenuItem
+                Set psTooltip to "Suggestion"
+                Set psDescription to "Suggest a feature, or report bugs..."
+                Set psImage to "Suggestion.ico"
+                Set pbControlBeginGroup to True
+
+                Procedure OnExecute Variant vCommandBarControl
+                    Send Info_Box "To be done after GitHub publication..."
+//                    Runprogram Shell Background "https://github.com/NilsSve/ProjectBilling/issues/1"
+                End_Procedure
+
+            End_Object
+
+            Object oExitMenuItem is a cCJExitMenuItem
+                Set psImage to "ActionExit.ico"
+                Set psToolTip to "Exit"
+                Set psDescription to "Exit the program (Alt+F4)"
+                Set pbControlBeginGroup to True
+            End_Object
+
+        End_Object                                       
+
+        Object oStatusBar is a cCJStatusBar
+            
+            Object oStatusPane1 is a cCJStatusBarPane
+                Set piID to sbpIDIdlePane
+                Set pbStyleStretch to True
+            End_Object
+    
+            Object oStatusPane2 is a cCJStatusBarPane
+                Set phoViewPane to Self
+                Set pbStyleStretch to True
+            End_Object
+    
+        End_Object
+    
+    End_Object
+
+    Object oClientArea is a ClientArea
+        Use SysCompany.vw
+        Use CodeTypeEntry.Vw
+        Use Customer.vw
+
+        Use Inventory.vw
+        Use ProjectBilling.vw
+        Use ProjectView.vw
+        
+        Use WinPrint\ProjectReportWP.rv
+        Use WinPrint\InvoiceReportWP.rv
+        Use WinPrint\CustomerListWP.rv
+        Use Basic\CustomerListBR.rv
+    
+        Use StdAbout.pkg
+        Use ZeroFile_vw.vw
+        Use ImpCust.rv
+        Procedure Activate_About
+            Send DoAbout "" "" "" "Author: Nils Svedmyr" "Invoice60x60.bmp" "E-mail: mailto:support@rdctools.com" "Web-site: www.rdctools.com" ("This tool was created with DataFlex" * String(C_DFVersion) * "from Data Access Worldwide. Please visit http://www.dataaccess.com for a free personal copy of DataFlex.")
+        End_Procedure
+    
+        // We don't allow closing of a view - it just doesn't make
+        // sense with a tabbed interface.
+        Function Exit_Loss_Confirmation for cUIObject Returns Integer
+            Function_Return 1
+        End_Function
+
+    End_Object
+
+    Procedure End_Construct_Object
+        Forward Send End_Construct_Object
+        Set Icon to "Invoice.ico"
+    End_Procedure
+
+    // On_Key constant for Ctrl+Shift+Tab
+    Define C_CtrlShiftTab for 7170
+    
+    On_Key C_CtrlShiftTab   Send Switch_Prior_View
+    On_Key Key_Ctrl+Key_Tab Send Switch_Next_View
+End_Object
+
+// The save of the splitter location is done by the DoSaveEnvironment message,
+// in the cApplication object
+Procedure InitializeWorkspace
+    Handle hoTab hoRegistry hoItem 
+    Handle[] hoAutoActivateViews
+    Variant vItem vTab vTabName
+    Integer iGroup iCount iSize iLoc iGroups iItems iDataLength iRightGroup
+    tWinWindowPlacement WindowPlacement
+    String sKey sSubKey sObjectName sCat
+    String[] asObjectNames 
+    Boolean bOpened bSuccess
+    
+    Move 1 to iRightGroup                                      
+    Move (SizeOfType(tWinWindowPlacement)) to iDataLength
+    Get phoAutoActivateViews of (Client_Id(ghoCommandBars)) to hoAutoActivateViews
+    Move (SizeOfArray(hoAutoActivateViews)) to iSize
+    Decrement iSize
+    For iCount from 0 to iSize
+        Move (Object_Label(hoAutoActivateViews[iCount])) to asObjectNames[-1]
+    Loop
+    
+    Get RegistryKeyString of ghoApplication to sKey
+    Get Create (RefClass(cRegistry)) to hoRegistry
+    Set pfAccessRights of hoRegistry to KEY_READ
+    Move (sKey +"\WINDOWS") to sKey
+        
+    Get Create (RefClass(cCJTabWorkspace)) to hoTab
+    Get ComShowTabWorkspace of ghoCommandBars True to vTab
+    Set pvComObject of hoTab to vTab
+    Send ComDoWorkspaceCommand of hoTab XTP_ID_WORKSPACE_NEWVERTICAL
+
+    Get ReadDword of ghoApplication "Preferences" "TabWorkspaceSplitterLoc" "350" to iLoc
+    If (iLoc > 300) Begin
+        Set ComGroupSplitter of hoTab 0 to iLoc
+    End          
+
+    Get ComItemCount of hoTab to iSize
+    Decrement iSize
+    For iCount from 0 to iSize
+        Move (sKey + "\" + asObjectNames[iCount]) to sSubKey
+        Get OpenKey of hoRegistry sSubKey to bOpened
+        If (bOpened = True) Begin 
+            Get ReadBinary of hoRegistry "Placement" (AddressOf(WindowPlacement)) iDataLength to bSuccess
+            If (bSuccess = True and WindowPlacement.NormalPosition.left > 0) Begin 
+                Get ComItem of hoTab iCount to vItem 
+                Send ComMoveToGroup of hoTab vItem iRightGroup
+            End
+        End
+    Loop    
+    
+    Send Destroy of hoRegistry
+    Send Destroy of hoTab
+End_Procedure
+Send InitializeWorkspace
+
+Send Activate_oInvoiceEntryView of (Client_Id(ghoCommandBars))
+Send Activate_oProjectView      of (Client_Id(ghoCommandBars))
+Start_UI

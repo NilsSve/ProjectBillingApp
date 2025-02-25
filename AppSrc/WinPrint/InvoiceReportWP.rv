@@ -1,0 +1,712 @@
+﻿Use Windows.pkg
+Use DFRptVw.pkg
+Use cWinReport2.pkg
+Use cRichEdit.pkg
+Use gFormatNumbers.pkg
+Use cRDCForm.pkg
+Use cRDCDbForm.pkg
+Use cRDCDbHeaderGroup.pkg
+Use cRDCHeaderGroup.pkg
+
+Use cInventoryDataDictionary.dd
+Use cCustomerDataDictionary.dd
+Use cInventoryDataDictionary.dd
+Use cInvoiceHeaderDataDictionary.dd 
+Use cInvoiceDetailDataDictionary.dd
+Use cSysFileDataDictionary.DD
+
+Register_Object oReport
+
+Deferred_View Activate_oInvoiceReportWP for ;
+Object oInvoiceReportWP is a ReportView
+    Set Location to 19 28
+    Set Size to 147 221
+    Set Label to "Print Project Billing" 
+    Set Icon to "Invoice.ico"
+
+    Property Integer piInvoiceID 0
+
+    Object oInvt_DD is a cInventoryDataDictionary
+    End_Object
+
+    Object oCustomer_DD is a cCustomerDataDictionary
+    End_Object 
+
+    Object oInvohea_DD is a cInvoiceHeaderDataDictionary
+        Set DDO_Server to oCustomer_DD
+
+        Property Number pnStartInvoice_Number
+        Property Number pnStopInvoice_Number
+
+        Procedure OnConstrain 
+            Number nStart nStop
+
+            Get pnStartInvoice_Number To nStart
+            Get pnStopInvoice_Number To nStop
+
+            Case Begin
+                Case (nStart <> 0 and nStop <> 0)
+                    Constrain InvoiceHeader.Invoice_Number Between nStart and nStop
+                    Case Break
+                Case (nStart <> 0)
+                    Constrain InvoiceHeader.Invoice_Number GE nStart
+                    Case Break
+                Case (nStop <> 0)
+                    Constrain InvoiceHeader.Invoice_Number LE nStop
+            Case End
+        End_Procedure
+    
+    End_Object
+
+    Object oInvodtl_DD is a cInvoiceDetailDataDictionary
+        Set DDO_Server To oInvt_DD
+        Set DDO_Server To oInvohea_DD
+        Set Constrain_File to InvoiceHeader.File_Number
+    End_Object
+
+    Set Main_DD to oInvohea_DD
+    Set Server  to oInvohea_DD
+
+    Object oBilling_grp is a cRDCHeaderGroup
+        Set Size to 134 214
+        Set Location to 4 4
+        Set Label to "Billing Report"
+        Set psNote to "Select Invoice Number"
+        Set psImage to "Invoice.ico"
+        Set peAnchors to anTopLeftRight
+
+            Object oInvoice_NumberSelection is a Group
+                Set Size to 35 177
+                Set Location to 27 28
+        
+                Object oSelStart is a cRDCForm
+                    Set Label to "Invoice Number:"
+                    Set Size to 13 35
+                    Set Location to 12 63
+                    Set Status_Help to "First value in selection range."
+                    Set Form_Datatype to 0
+                    Set Prompt_Button_Mode to PB_PromptOn
+                    Set Prompt_Object to (oInvoHea_sl(Self))
+
+                    Procedure Prompt_Callback Handle hoPrompt
+                        Forward Send Prompt_Callback hoPrompt
+                        Set peUpdateMode of hoPrompt to umPromptValue
+                    End_Procedure 
+                    
+                End_Object 
+        
+                Object oSelStop is a cRDCForm
+                    Set Label to "To:"
+                    Set Size to 14 24
+                    Set Location to 12 145
+                    Set Status_Help to "Last value in selection range."
+                    Set Label_Col_Offset to 2
+                    Set Label_Justification_Mode to jMode_Right
+                    Set Form_Datatype to 0
+                    Set Visible_State to False
+                End_Object 
+        
+                Function StartValue Returns String
+                    String sValue
+                    Get Value of oSelStart to sValue
+                    If (sValue = "") Get piInvoiceID to sValue
+                    Function_Return sValue
+                End_Function
+        
+                Function StopValue Returns String
+                    String sValue
+                    Get Value of oSelStop to sValue
+                    If (sValue = "") Get piInvoiceID to sValue
+                    Function_Return sValue
+                End_Function
+        
+            End_Object
+        
+            Object oPrintTo is a RadioGroup
+                Set Size to 38 118
+                Set Location to 66 28
+                Set Label to "Send Report to"
+        
+                Object oRadio1 is a Radio
+                    Set Label to "Report Viewer"
+                    Set Size to 10 61
+                    Set Location to 12 6
+                    Set Status_Help to "Prints the report to screen"
+                End_Object 
+        
+                Object oRadio2 is a Radio
+                    Set Label to "Printer"
+                    Set Size to 10 42
+                    Set Location to 24 6
+                    Set Status_Help to "Prints the report to printer"
+                End_Object 
+        
+                Function IsToPrinter Returns Boolean
+                    Integer iRadio
+                    Get Current_Radio to iRadio
+                    Function_Return (iRadio=1)
+                End_Function 
+        
+            End_Object 
+        
+            Object oBtnPrint is a Button
+                Set Label to "Print"
+                Set Location to 73 156
+                Set Status_Help to "Print the selected report"
+                Set Default_State to True
+                Procedure OnClick
+                    Send StartReport
+                End_Procedure
+            End_Object 
+        
+            Object oBtnPrinterSetup is a Button
+                Set Label to "Printer Setup"
+                Set Location to 90 156
+                Set Status_Help to "Set up printer for report"
+                Procedure OnClick
+                    Send DFPrintSetup of oReport
+                End_Procedure
+            End_Object 
+        
+            Object oBtnCancel is a Button
+                Set Label to "Close"
+                Set Location to 114 156
+                Set Status_Help to "Close this Panel"
+                Procedure OnClick
+                    Send Close_Panel
+                End_Procedure
+            End_Object 
+    
+            Object oReport is a cWinReport2
+                Set Report_Title to "Invoice"
+        
+                Object oReport2 is a cWinReport2
+        
+                    // Set DDO, Index and breaks for the report
+                    Set Server to oInvodtl_DD
+                    Set Ordering to 1
+                    Report_Breaks (SerializeRowId(GetRowId(InvoiceHeader.File_Number)))
+        
+                    Procedure SubHeader1 
+                        String  sFont 
+                        Integer iFontSize iStyle
+                        Integer iFill iBorder iHeaderStyle
+        
+                        If (Page_end_State(Self)) Begin // Page_end_State must get set in subtotal 1
+                            Send DFNew_Page // this will force a new page
+                        End
+        
+                        Move "Arial" to sFont
+                        Move 10 to iFontSize
+                        Move (FONT_DEFAULT) to iStyle
+                        Move (FONT_BOLD) to iHeaderStyle
+                        Move (RGB_DGREY) to iBorder
+                        Get DFGetDFColor 242 242 242 to iFill
+        
+                        DFFont sFont
+                        DFFontSize iFontSize
+                        DFBeginHeader DFSubHeader 1 
+                            String sValue
+                            
+                            DFHeaderLineCheck 5
+                            DFHeaderWrap   HDR_Wrap
+                            DFHeaderPos    HDR_Left
+                            DFHeaderFrame  Hdr_Margins 0.01 iBorder iFill
+                            DFHeaderMargin hm_BottomOuter 0.08
+                            DFHeaderMargin hm_TopInner    0.04
+                            DFHeaderMargin hm_BottomInner 0.20 //0.04
+        
+                            // Display fields to be placed in this sub-header
+                            DFWriteLn
+                            DFWritePos "Invoice Number:"              13 iHeaderStyle -1 4.9
+                            DFWritePos InvoiceHeader.Invoice_Number         16 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Invoice Date:"                13 iHeaderStyle -1 4.9
+                            DFWritePos InvoiceHeader.Invoice_Date           16 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Terms:"                       13 iHeaderStyle -1 4.9
+                            DFWritePos InvoiceHeader.Terms                  16 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Currency:"                    13 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Currency              16 iHeaderStyle -1
+                            DFWriteLn
+                            
+                            DFWritePos "Customer Number:"            0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Customer_Number       5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Customer Name:"              0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Name                  5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Street Address:"             0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Address               5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Zip/Postal Code:"            0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Zip                   5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "City:"                       0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.City                  5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "State:"                      0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.State                 5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Country:"                    0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Country               5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Phone Number:"               0.2 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Phone_Number          5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "E-Mail Address:"             0.2 iHeaderStyle -1 8
+                            DFWritePos Customer.Email_Address         5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Your Reference:"             0.2 iHeaderStyle -1 4.9
+                            DFWritePos InvoiceHeader.Ordered_By             5 iStyle -1
+                            DFWriteLn
+                            Move (Customer.VAT / 100 * InvoiceHeader.Invoice_Total + InvoiceHeader.Invoice_Total) to sValue
+                            Move (FormatCurrency(sValue, 0))  to sValue  
+                            Move (Replaces("á", sValue, " ")) to sValue
+                            Move (Replace("kr", sValue, ""))  to sValue  
+                            Move (Replace("$", sValue, ""))   to sValue  
+                            DFWritePos "Invoice Total:"              13 iHeaderStyle -1 4.9
+                            DFWritePos sValue                        16 FONT_BOLD -1
+                            DFWriteLn
+                            DFWritePos "Currency:"                   13 iHeaderStyle -1 4.9
+                            DFWritePos Customer.Currency             16 FONT_BOLD -1
+                            DFWriteLn
+        
+                            // Write the heading for the body section
+                            DFFontSize 1 // create a very small space on top of and below the horizontal bar
+                            DFWriteLn
+                            DFWriteLine DFGR_CURRLINE DFGR_CURRLINE DFGR_RB_MARGIN DFGR_HORI iBorder
+                            DFFontSize iFontSize
+                            DFWriteLn
+                            DFWritePos "From Company:"                0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.Company                5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Address:"                     0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.Address                5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Zip:"                         0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.Zip                    5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "City:"                        0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.City                   5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Country:"                     0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.Country                5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "Phone:"                       0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.Phone_Number           5 iStyle -1
+                            DFWriteLn
+                            DFWritePos "E-mail:"                      0.2 iHeaderStyle -1 4.9
+                            DFWritePos SysFile.E_Mail                 5 iStyle -1
+                            DFWriteLn
+                            DFWriteLn
+        
+                            // write the heading for the body section
+                            DFFontSize 1 // create a very small space on top of and below the horizontal bar
+                            DFWriteLn
+                            DFWriteLine DFGR_CURRLINE DFGR_CURRLINE DFGR_RB_MARGIN DFGR_HORI iBorder
+                            DFWriteLn
+                            DFFontSize iFontSize
+        //                    DFWritePos "Description"                  0.08 iHeaderStyle -1 5.46
+        //                    DFWritePos "Comment"                      5.62 iHeaderStyle -1 6.39
+        //                    DFWritePos "Quantity"                     (11.09 + 2.04) (iHeaderStyle + Font_Right) -1 2.04
+        //                    DFWritePos "Price"                        (13.21 + 1.91) (iHeaderStyle + Font_Right) -1 1.91
+        //                    DFWritePos "Total"                        (15.2 + 2.34) (iHeaderStyle + Font_Right) -1 2.34
+                            DFWritePos "Description"                  0.20 iHeaderStyle -1 2.46
+                            DFWritePos "Date     Comment"             2.62 iHeaderStyle -1 12
+                            DFWritePos "Quantity"                     (13.09 + 2.04) (iHeaderStyle + Font_Right) -1 2.04
+                            DFWritePos "Price"                        (14.21 + 1.91) (iHeaderStyle + Font_Right) -1 2
+                            DFWritePos "Total"                        (15.20 + 2.34) (iHeaderStyle + Font_Right) -1 2.34
+        
+                            DFFontSize 1 // create a very small space on top of and below the horizontal bar
+                            DFWriteLn
+                            DFWriteLn
+                            DFWriteLn
+        
+                        DFEndHeader
+                    End_Procedure
+        
+                    Procedure Body 
+                        String  sFont 
+                        Integer iFontSize iStyle
+        
+                        Move "arial" to sFont
+                        Move 10 to iFontSize
+                        Move (font_default) to iStyle
+        
+                        DFFont sFont
+                        DFFontSize iFontSize
+        
+                        DFWriteLn
+                        DFWritePos Inventory.Description                0.08 iStyle -1 2.46
+                        DFWritePos InvoiceDetail.Comment                2.62 iStyle -1 11.5
+                        DFWritePos InvoiceDetail.Qty_Ordered            (13.09 + 2.10) (iStyle + Font_Right) 2 2.04
+                        DFWritePos InvoiceDetail.Price                  (14.21 + 1.91) (iStyle + Font_Right) 0 1.91
+                        DFWritePos InvoiceDetail.Extended_Price         (15.2  + 2.5)  (iStyle + Font_Right) 0 2.5
+                        Send Add_SubTotal 4 InvoiceDetail.Extended_Price        
+        
+                    End_Procedure
+        
+                    Procedure SubTotal1 
+                        String  sFont sValue
+                        Integer iFontSize iStyle iFill iBorder
+                        Number  nAmount nVAT
+        
+                        Move "Arial" to sFont
+                        Move 10 to iFontSize
+                        Move (FONT_BOLD) to iStyle
+                        Move (RGB_DGREY) to iBorder
+                        Get DFGetDFColor 242 242 242 to iFill
+        
+                        DFFont sFont
+                        DFFontSize iFontSize
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFBeginHeader DFSubTotal 1
+                            DFHeaderPos    Hdr_Left
+                            DFHeaderWrap   Hdr_NoWrap
+                            DFHeaderFrame  HDR_Margins 0.01 iBorder iFill
+                            DFHeaderMargin HM_BottomOuter 1 //0.16
+                            DFHeaderMargin HM_TopInner 0.04
+                            DFHeaderMargin HM_BottomInner 0.04
+                            DFHeaderFrame  Hdr_Margins 0.01 iBorder iFill
+        
+                            Get SubTotal ( 4 + 0) to nAmount
+                            Send Add_SubTotal ( 4 + 5) nAmount
+                            DFWriteLn
+                            DFWritePos "Subtotal" (13.2 + 2.34) (iStyle + Font_Right) 2 2.34
+                            Get FormatCurrency nAmount 0  to sValue  
+                            Move (Replaces("á", sValue, " ")) to sValue
+                            Move (Replace("kr", sValue, ""))  to sValue  
+                            Move (Replace("$", sValue, ""))   to sValue  
+                            DFWritePos sValue    (15.2 + 2.5) (iStyle + Font_Right) 2 2.34
+        
+                            DFHeaderPos   Hdr_Left
+                            DFHeaderWrap  Hdr_NoWrap
+                            DFHeaderFrame HDR_Margins 0.01 iBorder iFill
+                            DFHeaderMargin HM_BottomOuter 0.16
+                            DFHeaderMargin HM_TopInner 0.04
+                            DFHeaderMargin HM_BottomInner 0.04
+                            DFHeaderFrame Hdr_Margins 0.01 iBorder iFill
+        
+                            DFWriteLn
+                            Move Customer.VAT to nVAT
+                            DFWritePos ("VAT" * String(nVAT) * "%") (13.2 + 2.5) (iStyle + Font_Right) 2 2.34
+                            Move (Customer.VAT / 100 * nAmount) to nAmount
+                            Get FormatCurrency nAmount 0 to sValue
+                            Move (Replaces("á", sValue, " ")) to sValue
+                            Move (Replace("kr", sValue, ""))  to sValue  
+                            Move (Replace("$", sValue, ""))   to sValue  
+                            DFWritePos sValue         (15.2 + 2.5) (iStyle + Font_Right) 2 2.34
+                            DFWriteLn
+        
+                            Move (Customer.VAT / 100 * InvoiceHeader.Invoice_Total + InvoiceHeader.Invoice_Total) to sValue
+                            Get FormatCurrency sValue 0  to sValue  
+                            Move (Replaces("á", sValue, " ")) to sValue
+                            Move (Replace("kr", sValue, ""))  to sValue  
+                            Move (Replace("$", sValue, ""))   to sValue  
+                            Move ("INVOICE TOTAL:" * String(sValue)) to sValue
+                            DFWritePos sValue         (15.2 + 2.5) (iStyle + Font_Right) 2 5.34
+                            DFWriteLn
+                            Move ("Currency:" * String(Trim(Customer.Currency))) to sValue
+                            DFWritePos sValue         (15.2 + 2.5) (iStyle + Font_Right) 2 5.34
+        
+                            DFWriteLn
+                        DFEndHeader
+        
+                        DFWriteLn 
+                        DFWriteLn 
+                        Set Page_end_State to True // force a page-break when this section ends
+        
+                    End_Procedure
+        
+                End_Object
+        
+                // Set DDO, Index and breaks for the report
+                Set Server to oInvohea_DD
+                Set Ordering to 1
+                // Report_Breaks (SerializeRowId(GetRowId(Invohea.File_Number))) // break is coded in child report for zero suppression of header
+        
+                Function Starting_Main_Report Returns Integer
+                    Boolean bErr
+                    Send DFSetMetrics wpm_cm
+                    Send DFSetmargins 2 1 1 1
+                    //Send DFSetLandscape false // This can be used to force a page orientation
+                    Forward Get Starting_Main_Report to bErr
+                    Function_Return bErr
+                End_Function 
+        
+                // Page_Top is printed first at the top margin of each page
+                Procedure Page_Top 
+                    String  sFont
+                    Integer iFontSize
+        
+                    Move "Arial" to sFont
+                    Move 10 to iFontSize
+        
+                    DFFont sFont
+                    DFFontSize iFontSize
+                    DFBeginHeader DFPageTop
+                        DFHeaderFrame Hdr_NoFrame
+                        DFHeaderPos   Hdr_Left
+                    DFEndHeader
+        
+                End_Procedure
+        
+                // Report_Header is printed once in a report after Page_Top
+                //Procedure Report_Header
+                //    string  sFont
+                //    integer iFontSize
+                //    Move "arial" to sFont
+                //    Move 10 to iFontSize
+                //    DFFont sFont
+                //    DFFontSize iFontSize
+                //    DFBeginHeader  DFReportHeader
+                //        DFHeaderFrame  Hdr_Margins 0.01
+                //        DFHeaderPos    Hdr_Left
+                //        DFHeaderMargin HM_BottomOuter 0.08
+                //        DFWrite     "Report_Header" (Font_Bold+Font_Center)
+                //    DFEndHeader
+                //End_Procedure
+        
+                Procedure Page_Header 
+                    Integer iFill iBorder iStyle
+                    String  sFont sReportTitle
+                    Integer iFontSize
+        
+                    Move "Arial" to sFont
+                    Move 16 to iFontSize
+                    Move (Font_bold + rgb_White) to iStyle
+                    Move (rgb_dGrey) to iFill
+                    Move (rgb_dGrey) to iBorder
+                    Get Report_Title to sReportTitle
+        
+                    DFFont sFont
+                    DFFontSize iFontSize
+                    DFBeginHeader DFPageHeader
+                        DFHeaderPos   Hdr_Left
+                        DFHeaderFrame Hdr_Margins 0.01 iBorder iFill
+                        DFWriteLnPos sReportTitle 0.1 iStyle
+                        DFHeaderMargin HM_BottomOuter 0.08
+                    DFEndHeader
+        
+                End_Procedure // Page_Header
+        
+                // Page_Title appears on every page after Page_Header
+                //Procedure Page_Title
+                //    string  sFont
+                //    integer iFontSize
+                //    Move "arial" to sFont
+                //    Move 10 to iFontSize
+                //    DFFont sFont
+                //    DFFontSize iFontSize
+                //    DFBeginHeader  DFPageTitle
+                //        DFHeaderFrame  Hdr_Margins 0.01
+                //        DFHeaderPos    Hdr_Left
+                //        DFHeaderMargin HM_BottomOuter 0.08
+                //        DFWrite     "Page_Title" (Font_Bold+Font_Center)
+                //    DFEndHeader
+                //End_Procedure
+        
+                Procedure Total 
+                    String  sFont sText
+                    Integer iFontSize iStyle iFill iBorder
+                    Number  nAmount
+        
+                    Move "arial" to sFont
+                    Move 10 to iFontSize
+                    Move (font_bold) to iStyle
+                    Move (rgb_Grey) to iFill
+                    Move (rgb_dGrey) to iBorder
+        
+                    DFFont sFont
+                    DFFontSize iFontSize
+                    DFBeginHeader DFTotal
+                        DFHeaderPos   Hdr_Left
+                        DFHeaderFrame Hdr_Margins 0.01 iBorder iFill
+        
+                        Get SubTotal ( 4 + 5) to nAmount
+                        DFWritePos "TOTAL"                                (13.2 + 2.34) (iStyle + Font_Right) 2 2.34
+                        DFWritePos (Customer.VAT/100 * nAmount + nAmount) (15.2 + 2.34) (iStyle + Font_Right) 2 2.34
+                        DFWriteLn   
+                        DFWriteLn 
+                        
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFWritePos "National Payments:"         2.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWritePos SysFile.Bank                 7.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWritePos "Account Number:"            2.34 iStyle -1 0
+                        DFWritePos SysFile.Bank_Account         7.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFWritePos "InterNational Payments:"    2.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWritePos "IBAN Number:"               2.34 iStyle -1 0
+                        DFWritePos SysFile.IBAN                 7.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWritePos "(SWIFT) BIC Number:" 2.34 iStyle -1 0
+                        DFWritePos SysFile.BIC                  7.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFWritePos "VAT number:"                2.34 iStyle -1 0
+                        DFWritePos SysFile.VAT_Number           7.34 iStyle -1 0
+                        DFWriteLn 
+                        DFWriteLn 
+                        
+                        Set Value     of oRichEdit1          to ""
+                        Set Value     of oRichEdit1          to SysFile.Terms
+                        Get TextRange of oRichEdit1 0 999999 to sText
+                        DFWritePos sText                        2.34 Font_Default -1 
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFWriteLn 
+                        DFWriteLn 
+                    DFEndHeader
+        
+                End_Procedure
+        
+                // Report_Footer is printed once on the last page before Page_Footer
+                //Procedure Report_Footer
+                //    string  sFont
+                //    integer iFontSize
+                //    Move "arial" to sFont
+                //    Move 10 to iFontSize
+                //    DFFont sFont
+                //    DFFontSize iFontSize
+                //    DFBeginHeader DFReportFooter
+                //        DFHeaderFrame  Hdr_Margins 0.01
+                //        DFHeaderPos    Hdr_Left
+                //        DFHeaderMargin HM_BottomOuter 0.08
+                //        DFWrite     "Report_Footer" (Font_Bold+Font_Center)
+                //    DFEndHeader
+                //End_Procedure
+        
+                Procedure Page_Footer 
+                    String sStart sStop sText
+                    String  sFont 
+                    Integer iFontSize iStyle
+                    Handle  hoDD
+        
+                    Move "Arial" to sFont
+                    Move 10 to iFontSize
+                    Move (font_default) to iStyle
+        
+                    Get Server to hoDD
+        
+                    DFFont sFont
+                    DFFontSize iFontSize
+                    DFBeginHeader DFPageFooter
+                        DFHeaderFrame hdr_NoFrame
+                        DFHeaderPos   hdr_Left
+        
+                        Get pnStartInvoice_Number of hoDD to sStart
+                        Get pnStopInvoice_Number  of hoDD to sStop
+                        Get SelectionCriteraDescription "InvoiceHeader.Invoice_Number" sStart sStop to sText
+                        If (sText<>"") Begin
+        //                    DFWriteLnPos sText 0.1
+                        End
+        
+                    DFEndHeader
+                End_Procedure 
+        
+                // Page_Bottom is printed last at the bottom margin of each page
+                Procedure Page_Bottom 
+                    String sFont
+                    Integer iFontSize iBorder iStyle
+                    DateTime dtDT
+        
+                    Move (CurrentDateTime()) to dtDT
+        
+                    Move "arial" to sFont
+                    Move 10 to iFontSize
+                    Move (font_default) to iStyle
+                    Move (rgb_dGrey) to iBorder
+        
+                    DFFont sFont
+                    DFFontSize iFontSize
+                End_Procedure
+        
+                // Returns string with description of selection ranges
+                // Pass: Selection title, start value and end value. Return: description
+                Function SelectionCriteraDescription String sTitle String sStart String sStop Returns String
+                    String sText
+                    If (sStart=""  and sStop="")  Function_Return ""
+                    If (sStart="0" and sStop="0") Function_Return ""
+                    If (sStart<>"" and sStop<>"") Begin
+                        Move ("between" * sStart * "and" * sStop) to sText
+                    End
+                    Else If (sStart > "") Begin
+                        Move ("starting at" * sStart) to sText
+                    End
+                    Else If (sStop > "") Begin
+                        Move ("up to" * sStop) to sText
+                    End
+                    Function_Return (sTitle * sText)
+                End_Function
+        
+            End_Object 
+        
+            Object oRichEdit1 is a cRichEdit
+                Set Size to 90 286
+                Set Location to 177 30
+            End_Object 
+        
+            Procedure StartReport 
+                Boolean bToPrinter
+                Handle hoDD
+                String sValue
+                Number nStart nStop
+        
+                Get Server of oReport to hoDD
+        
+                // Set all selection critera properties
+                Get StartValue of oInvoice_NumberSelection to sValue
+                Set pnStartInvoice_Number of hoDD to sValue
+        
+                Get StopValue of oInvoice_NumberSelection to sValue
+                Set pnStopInvoice_Number of hoDD to sValue
+        
+        
+                // determine if direct print
+                Get IsToPrinter of oPrintTo to bToPrinter
+                Set OutPut_Device_Mode of oReport to (If(bToPrinter, PRINT_TO_PRINTER, PRINT_TO_WINDOW))
+        
+                // run the report
+                Send Run_Report of oReport
+            End_Procedure
+    
+    End_Object
+
+    Procedure Entering_Scope Returns Integer
+        Integer iRetVal
+        Integer iID iIDLocal
+        Handle hoDD
+        
+        Forward Get msg_Entering_Scope to iRetVal
+        Get piInvoiceID of (Main_DD(Self)) to iIDLocal
+        Get piInvoiceID of ghoApplication to iID
+        If (iIDLocal < 1 or iIDLocal <> iID) Begin
+            If (iID <> -1) Begin
+                Move (Main_DD(oInvoiceReportWP(Self))) to hoDD
+                Set piInvoiceID of hoDD to iID
+                Send Clear_All of hoDD
+                Move iID to InvoiceHeader.Invoice_Number                          
+                Send Find of hoDD EQ 1
+                Send Request_Relate of hoDD
+                Set Value of oSelStart to iID
+                Set Value of oSelStop  to iID
+            End
+        End
+        Procedure_Return iRetVal
+    End_Procedure
+
+Cd_End_Object
+
+// General purpose access message
+Procedure ShowInvoiceReport Integer iInvoiceID 
+    Set piInvoiceID of ghoApplication to iInvoiceID
+    Send Activate_oInvoiceReportWP
+End_Procedure

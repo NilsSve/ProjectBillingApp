@@ -1,0 +1,53 @@
+
+Body  {background-color: #f2f2f2; ; color: Black;
+       Margin-Top: 5px; Margin-Left: 5px;
+       font-family: Arial; font-size: 9pt}
+Table {font-family: Arial; font-size: 9pt}
+Input    {font-family:  Arial; font-size: 9pt}
+textarea {font-family:  Arial; font-size: 9pt}
+select   {font-family:  Arial; font-size: 9pt}
+td    {}
+tr    {}
+
+Form  {margin: 5px}
+
+hr    {height: 2px; color: gray}
+
+h3    { Padding: 3pt; Font-weight: 800; Font-Size: 12pt; Color: #000080; Background-Color: #99ccff}
+
+h4    { Padding: 3pt; Font-weight: 800; Font-Size: 10pt; Color: #000080 }
+
+.ActionButton {border: #000000 1px solid; cursor: hand; font-size: 13 px}
+
+.footer {font-size: 8pt; margin: 2px}
+
+.Toolbar {margin-top: 0px; margin-bottom: 5px; border-top-style: solid; background-color: silver; padding: 8px;  border-color: gray; 
+           border-bottom-style: solid ; border-width: 2px}
+
+.Label  {color: #000080}
+
+.EntryBlock {background-color: lightyellow; margin: 0px; margin-bottom: 5px; border: groove thin;  padding: 8px}
+
+
+.EntryTable        {}
+.EntryTable .Data  {}
+.EntryTable .Error {color: #FF0000 }
+.EntryTable .Label {}
+
+.ReportTable         { Border: solid gray 1px; Border-top: none; background-color: lightyellow}
+.ReportTable .Data   { padding-left: 3px; padding-right: 3px}
+.ReportTable .Header { color: #000080; background-color: #c0c0c0; padding-left: 3px; padding-right: 3px }
+
+.ReportHdr1Table         {}
+.ReportHdr1Table .Data   {text-align: left;  vertical-align: top; }
+.ReportHdr1Table .Label  {text-align: left;  vertical-align: top; }
+
+.ZoomTable         {}
+.ZoomTable .Data   {text-align: left; vertical-align: top; padding-left: 3px; padding-right: 3px}
+.ZoomTable .Label  {text-align: left; vertical-align: top; color: #000080;  }
+.ZoomTable .Header {color: #000080; background-color: #c0c0c0; text-align: left; vertical-align: top; 3px; padding-left: padding-right: 3px}
+
+A:link    {color: #000080; }
+A:visited {color: #000080; }
+A:active  {color: #003366; }
+A:hover   {color: #003366; }

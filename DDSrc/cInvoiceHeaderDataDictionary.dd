@@ -1,0 +1,181 @@
+﻿Use Windows.pkg
+Use DataDict.pkg
+Use Ddvaltbl.pkg
+Use LanguageText.pkg
+Use cRDCAutoCreateNewID.pkg
+
+Open InvoiceHeader 
+Open InvoiceDetail
+Open Customer
+
+Use cInvoiceDetailDataDictionary.dd
+Use cInvoiceDetailADataDictionary.dd
+
+Set_Attribute DF_FILE_ALIAS of InvoiceDetail.File_Number  to DF_FILE_IS_MASTER
+Set_Attribute DF_FILE_ALIAS of InvoiceDetailA.File_Number to DF_FILE_IS_ALIAS
+
+Register_Object InvoiceHeader_Terms_VT
+//Register_Object InvoiceHeader_Ship_Via_VT
+Register_Object oInvoiceHeader_sl
+
+Object InvoiceHeader_Terms_VT  is a DescriptionValidationTable
+
+    Procedure Fill_List
+        Forward Send Fill_List 
+//        #IFDEF Language$Svenska
+//            Send Add_Table_Value "NONE" "Ej fastställt"
+//            Send Add_Table_Value "COD" "Kontant vid leverans"
+//            Send Add_Table_Value "NET10" "10 dgr"
+//            Send Add_Table_Value "NET30" "30 dgr"
+//            Send Add_Table_Value "NET60" "60 dgr"
+//            Send Add_Table_Value "NET90" "90 dgr"
+//            Send Add_Table_Value "PREPAY" "Förskottsb"
+//        #ELSE
+            Send Add_Table_Value  "NONE"   "None established"
+            Send Add_Table_Value  "COD"    "Cash On Delivery"
+            Send Add_Table_Value  "NET10"  "Net 10 days"
+            Send Add_Table_Value  "NET30"  "Net 30 days"
+            Send Add_Table_Value  "NET60"  "Net 60 days"
+            Send Add_Table_Value  "NET90"  "Net 90 days"
+            Send Add_Table_Value  "PREPAY" "Pre-payment"
+//        #ENDIF
+    End_Procedure 
+End_Object 
+
+//Object InvoiceHeader_Ship_Via_VT  is a CodeValidationTable
+//    Set Type_Value        to "SHIPPING"
+//    Set Allow_Blank_State to True
+//End_Object 
+
+Class cInvoiceHeaderDataDictionary  is a DataDictionary
+
+    Import_Class_Protocol cRDCAutoCreateNewIDMixin
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        Set Main_File To InvoiceHeader.File_Number
+
+        Set Add_Server_File to Customer.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        // Child (Client) file structure................
+        Set Add_Client_File to InvoiceDetail.File_Number
+
+        // Parent (Server) file structure...............
+
+        // Field-based properties.......................
+
+        Set Field_Option Field InvoiceHeader.Invoice_Number DD_AUTOFIND to True
+        Set Field_Prompt_Object Field InvoiceHeader.Invoice_Number to oInvoiceHeader_sl
+        Set Key_Field_State Field InvoiceHeader.Invoice_Number to True
+        Set Status_Help Field InvoiceHeader.Invoice_Number to "Invoice Number - New orders are assigned numbers automatically"
+
+        Set Field_Class_Name Field InvoiceHeader.Invoice_Date to "dbForm"
+        Set Field_Entry_msg Field InvoiceHeader.Invoice_Date To Entry_Invoice_Date
+        Set Field_Mask_Type Field InvoiceHeader.Invoice_Date To Mask_Date_Window
+//        Set Field_Prompt_Object Field InvoiceHeader.Invoice_Date to oInvoiceHeader_sl
+        Set Status_Help Field InvoiceHeader.Invoice_Date To "Date on which the invoice was created"
+        Set Field_Option Field InvoiceHeader.Invoice_Date DD_COMMIT to True
+        Set Field_Option Field InvoiceHeader.Invoice_Date DD_REQUIRED to True
+
+        Set Field_Class_Name Field InvoiceHeader.Terms To "dbComboForm"
+        Set Field_Value_Table Field InvoiceHeader.Terms to InvoiceHeader_Terms_VT
+
+//        Set Field_Class_Name Field InvoiceHeader.Ship_Via To "dbComboForm"
+//        Set Field_Value_Table Field InvoiceHeader.Ship_Via to InvoiceHeader_Ship_Via_VT
+
+
+        Set Field_Mask_Type Field InvoiceHeader.Invoice_Total To Mask_Numeric_Window
+//        Set Field_Option Field InvoiceHeader.Invoice_Total DD_DISPLAYONLY to True
+
+
+        Set Field_Class_Name Field InvoiceHeader.Payed_Date To "dbSpinForm"
+        Set Field_Mask_Type Field InvoiceHeader.Payed_Date to Mask_Date_Window
+
+        Set Field_Mask_Type Field InvoiceHeader.Invoice_Total_Qty_Ordered to Mask_Numeric_Window
+//        Set Field_Option Field InvoiceHeader.Invoice_Total_Qty_Ordered DD_DISPLAYONLY to True
+
+    End_Procedure
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Changed_Value Field InvoiceHeader.Terms to "COD"
+        Set Field_Changed_Value Field InvoiceHeader.Invoice_Date to (CurrentDateTime())
+    End_Procedure
+
+    // Add a default date if the field is blank
+    Procedure Entry_Invoice_Date Integer iField Date dDate
+         Integer iChanged
+         
+         Get Field_Changed_State iField To iChanged
+         If (iChanged=0 And dDate=0) Begin
+            SysDate dDate
+            Set Field_Default_Value iField To dDate
+         End
+    End_Procedure
+
+    Procedure Creating
+        Integer iID
+        Forward Send Creating
+        Get AutoCreateNewID File_Field InvoiceHeader.Invoice_Number True to iID
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        Send Adjust_Balances InvoiceHeader.Invoice_Total
+    End_Procedure
+
+    Procedure Backout
+        Forward Send Backout
+        Send Adjust_Balances (-InvoiceHeader.Invoice_Total)
+    End_Procedure
+
+    Procedure Adjust_Balances Number Amt
+        Add Amt to Customer.Purchases
+        Add Amt to Customer.Balance
+    End_Procedure
+
+    Procedure Deleting
+        Forward Send Deleting
+    End_Procedure
+
+    Procedure RecalcTotalTime
+        String sTime 
+        Integer iTotTime iTime
+        Integer iID  
+        Number nQty nTotQty nAmt nTotAmt
+        
+        Move 0 to iTotTime 
+        Move 0 to nAmt
+        Move 0 to nTotAmt
+        Send Refind_Records
+        Move InvoiceHeader.Invoice_Number to iID
+        Clear InvoiceDetailA
+
+        Constraint_Set Self Delete
+        Constraint_Set Self
+        Constrain InvoiceDetailA Relates to InvoiceHeader
+        Constrained_Find First InvoiceDetailA by Index.1
+        While (Found and InvoiceDetailA.Invoice_Number = iID)
+            Move InvoiceDetailA.Qty_Ordered to nQty
+            Move (nQty + nTotQty) to nTotQty
+            Move InvoiceDetailA.Extended_Price to nAmt
+            Move (nAmt + nTotAmt) to nTotAmt
+            Constrained_Find Next //InvoiceDetailA by Index.1
+        Loop
+        
+        Set Field_Changed_Value Field InvoiceHeader.Invoice_Total_Qty_Ordered to nTotQty
+        Set Field_Changed_Value Field InvoiceHeader.Invoice_Total to nTotAmt
+        Send Request_Save
+    End_Procedure   
+    
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+    Use InvoiceHeader.SL
+#ENDIF

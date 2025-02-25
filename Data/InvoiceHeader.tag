@@ -1,0 +1,11 @@
+Invoice_Number
+Customer_Number
+Invoice_Date
+Terms
+Ship_Via
+Ordered_By
+SalesPerson_ID
+Invoice_Total
+Last_Detail_Num
+Payed_Date
+Invoice_Total_Qty_Ordered

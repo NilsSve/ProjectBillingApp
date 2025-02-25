@@ -1,0 +1,57 @@
+﻿Use Windows.pkg
+Use DataDict.pkg
+Use DDValTbl.pkg
+
+Open CodeType
+Open CodeMast
+
+Register_Object CodeType_SL
+
+Class cCodeTypeDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        Set Main_File to CodeType.File_Number
+
+        Set Add_Client_File to CodeMast.File_Number
+        
+        Set Cascade_Delete_State To False
+        
+        Set Field_Option Field CodeType.Type DD_AUTOFIND to True
+        Set Field_Option Field CodeType.Type DD_REQUIRED to True
+        Set Field_Option Field CodeType.Type DD_CAPSLOCK to True
+        Set Field_Prompt_Object Field CodeType.Type to codetype_sl
+        Set Status_Help Field CodeType.Type to "Code type or 'category'. Each type contains multiple codes."
+
+        Set Status_Help Field CodeType.Description to "A description of the code type."
+
+        Set Status_Help Field CodeType.Comment to "An extended description of the code category."
+
+    End_Procedure
+
+    // Disallow blank types
+    Function Validate_Save Returns Integer
+        Integer iRetVal
+        
+        Forward Get Validate_Save to iRetVal
+        If iRetVal Begin
+            Function_Return iRetVal
+        End
+        
+        If (CodeType.Type = '') Begin
+            Send UserError "Blank Type Values are not allowed." ""
+            Function_Return 1
+        End
+    End_Function
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+    End_Procedure
+    
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+    Use CodeType.sl
+#ENDIF

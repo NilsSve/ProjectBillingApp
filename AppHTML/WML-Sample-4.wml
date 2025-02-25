@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
+<!-- Wml-sample-4.wml
+     This sample was created to give you an idea of what a WML Entry form might look like. It uses
+     the wml <input> tag to generate the input controls. You would rarely ever create a static page
+     like this. Instead, you would use WebApp to generate an entry page like this dynamically
+     (which is exactly what the Wap Entry wizard does and is what the WapCustList sample does).
+     This page was created to give you an idea of what WML markup looks like.
+-->
+<wml>
+        <head>
+                <meta forua="true" http-equiv="Cache-Control" content="must-revalidate"/>
+        </head>
+        <card id="Card1" newcontext="true">
+                <p align="center">
+                        <b>Wap Customer Entry and Maintenance</b>
+                </p>
+                <p>
+                        <b>Number: </b>
+                        <i>(1) </i>
+                        <input name="customer__customer_number" value="1"/>
+                        <br/>
+                        <b>Customer Name: </b>
+                        <i>(Data Access Corporation) </i>
+                        <input name="customer__name" value="Data Access Corporation"/>
+                        <br/>
+                        <b>Status: </b>
+                        <i>(Y) </i>
+                        <input name="customer__status" value="Y"/>
+                        <br/>
+                        <b>Address: </b>
+                        <i>(14000 SW 119 Ave) </i>
+                        <input name="customer__address" value="14000 SW 119 Ave"/>
+                        <br/>
+                        <select name="action">
+                                <option title="Go:Discard" onpick="/WebAppSample10/WapCustomerMaint.asp?Recid=1&amp;Index=1">Discard Changes</option>
+                                <option value="New" title="Go:Save">Save Changes</option>
+                        </select>
+                </p>
+                <do type="accept" label="Save">
+                        <go href="/DAW.Examples.Web.WebAppSample10/WapCustomerMaint.asp?Rnd=919" method="post">
+                                <postfield name="Action" value="Save"/>
+                                <postfield name="customer__recnum" value="1"/>
+                                <postfield name="customer__customer_number" value="$(customer__customer_number)"/>
+                                <postfield name="customer__name" value="$(customer__name)"/>
+                                <postfield name="customer__status" value="$(customer__status)"/>
+                                <postfield name="customer__address" value="$(customer__address)"/>
+                        </go>
+                </do>
+        </card>
+</wml>
+
+
+
+

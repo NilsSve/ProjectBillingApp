@@ -1,0 +1,8 @@
+#REPLACE FILE43 ProjectRows
+#REPLACE ProjectRows.Recnum |FN43,0
+#REPLACE ProjectRows.ID |FN43,1
+#REPLACE ProjectRows.ProjectID |FN43,2
+#REPLACE ProjectRows.ElapsedTime |FS43,3
+#REPLACE ProjectRows.WorkDate |FD43,4
+#REPLACE ProjectRows.Comment |FS43,5
+#REPLACE ProjectRows.Invoiced |FN43,6

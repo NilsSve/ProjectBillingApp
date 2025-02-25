@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
+<!-- Wml-sample-3.wml
+     This sample was created to give you an idea of what a WML Display form might look like.
+     You would rarely ever create a static page like this. Instead, you would use WebApp to generate
+     a display page like this dynamically (which is exactly what the Wap Entry wizard
+     does and is what the WapCustList sample does).
+     This page was created to give you an idea of what WML markup looks like.
+-->
+<wml>
+        <head>
+                <meta forua="true" http-equiv="Cache-Control" content="must-revalidate"/>
+        </head>
+        <card id="Card1" newcontext="true">
+                <p align="center">
+                        <b>Wap Customer Entry and Maintenance</b>
+                </p>
+                <p>
+                        <b>Number</b>   1<br/>
+                        <b>Customer Name</b>   Data Access Corporation<br/>
+                        <b>Status</b>   Y<br/>
+                        <b>Address</b>   14000 SW 119 Ave<br/>
+                </p>
+                <do type="accept" label="Next">
+                        <go href="/DAW.Examples.Web.WebAppSample10/WapCustomerMaint.asp?Rnd=753" method="post">
+                                <postfield name="Action" value="Next"/>
+                                <postfield name="Index" value="1"/>
+                                <postfield name="customer__recnum" value="1"/>
+                        </go>
+                </do>
+                <do type="prev" label="Prev">
+                        <go href="/DAW.Examples.Web.WebAppSample10/WapCustomerMaint.asp?Rnd=753" method="post">
+                                <postfield name="Action" value="Prev"/>
+                                <postfield name="Index" value="1"/>
+                                <postfield name="customer__recnum" value="1"/>
+                        </go>
+                </do>
+                <do type="options" label="Search/List">
+                        <go href="WapCustList.asp?RecId=1&amp;Index=1"/>
+                </do>
+        </card>
+</wml>
+
+
+

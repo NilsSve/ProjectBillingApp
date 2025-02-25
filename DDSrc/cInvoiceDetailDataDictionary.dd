@@ -1,0 +1,125 @@
+﻿Use Windows.pkg
+Use DataDict.pkg
+Use Ddvaltbl.pkg
+Use TimeFunc.pkg
+
+Open Inventory
+Open InvoiceHeader
+Open InvoiceDetail
+
+Class cInvoiceDetailDataDictionary is a DataDictionary
+
+    // Define_Fields:
+    // This procedure is used to set up all data-dictionary rules.
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        Set Main_File to InvoiceDetail.File_Number
+
+//        Set Foreign_Field_Option DD_KEYFIELD DD_AUTOFIND to True
+//        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+//        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+//        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+//        Set Foreign_Field_Option DD_INDEXFIELD DD_FINDREQ to True
+//        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+        
+
+        // Parent (Server) file structure...............
+        Set Add_Server_File to InvoiceHeader.File_Number
+        Set Add_Server_File to Inventory.File_Number
+
+        Set Field_Auto_Increment Field InvoiceDetail.Detail_Number to File_Field InvoiceHeader.Last_Detail_Num
+
+        // Field-based properties.......................
+
+        Set Field_Option Field InvoiceDetail.Invoice_Number DD_NOPUT to True
+
+        // Field Invodtl.Detail_Number to "This is maintained internally and is normally not displayed"
+        Set Field_Option Field InvoiceDetail.Detail_Number DD_NOPUT to True
+
+        Set Field_Exit_msg Field InvoiceDetail.Qty_Ordered to Adjust_Display_Total
+        Set Field_Label_Long Field InvoiceDetail.Qty_Ordered to "Quantity Ordered"
+        Set Field_Label_Short Field InvoiceDetail.Qty_Ordered to "Quantity"
+        Set Field_Mask_Type Field InvoiceDetail.Qty_Ordered to Mask_Numeric_Window
+        Set Status_Help Field InvoiceDetail.Qty_Ordered to "Number of items ordered"
+
+        // Field Invodtl.Price to "Default is set from Invt. Can be adjusted for each order."
+        Set Field_Entry_msg Field InvoiceDetail.Price to Entering_Price
+        Set Field_Exit_msg Field InvoiceDetail.Price to Adjust_Display_Total
+        Set Field_Label_Long Field InvoiceDetail.Price to "Price per Unit"
+        Set Field_Label_Short Field InvoiceDetail.Price to "Price"
+        Set Field_Mask_Type Field InvoiceDetail.Price to Mask_Currency_Window
+        Set Field_Mask Field InvoiceDetail.Price to (",*0.")
+        Set Status_Help Field InvoiceDetail.Price to "Price per Unit"
+
+        // Field Invodtl.Extended_Price to "System Maintained: Ext Price = Qty * Price"
+        Set Field_Label_Long Field InvoiceDetail.Extended_Price to "Extended Price"
+        Set Field_Label_Short Field InvoiceDetail.Extended_Price to "Total"
+        Set Field_Mask_Type Field InvoiceDetail.Extended_Price to Mask_Currency_Window
+        Set Field_Option Field InvoiceDetail.Extended_Price DD_DISPLAYONLY to True
+        Set Status_Help Field InvoiceDetail.Extended_Price to "Total extended price"
+        Set Field_Mask Field InvoiceDetail.Extended_Price to (",*0.")
+//        Set Field_Mask Field InvoiceDetail.Extended_Price to (",*0.00 " + Default_Currency_Symbol() + ";-"+",*0.00 " + Default_Currency_Symbol())
+
+    End_Procedure
+
+    // Field_Defaults:
+    // This procedure is used to establish default field values.
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        Move (InvoiceDetail.Price * InvoiceDetail.Qty_Ordered) to InvoiceDetail.Extended_Price
+        Send Adjust_Balances InvoiceDetail.Qty_Ordered InvoiceDetail.Extended_Price
+    End_Procedure
+    
+    Procedure Backout
+        Forward Send Backout
+        Send Adjust_Balances (-InvoiceDetail.Qty_Ordered) (-InvoiceDetail.Extended_Price)
+    End_Procedure
+
+    // Called by Backout and Update passing the quantity
+    // and the extended price. 
+    // Subtract quantity from Invt on-hand and
+    // add extended amnt to order total.
+    Procedure Adjust_Balances Number Qty Number Amt
+        Subtract Qty from Inventory.On_Hand
+        Add Amt to InvoiceHeader.Invoice_Total 
+        Add Qty to InvoiceHeader.Invoice_Total_Qty_Ordered
+    End_Procedure
+
+    Procedure Adjust_Display_Total
+        Number nAmnt nQty
+        Get Field_Current_Value Field InvoiceDetail.Qty_Ordered to nQty
+        Get Field_Current_Value Field InvoiceDetail.Price       to nAmnt
+        // note we set value, but not changed state!
+        Set Field_Current_Value Field InvoiceDetail.Extended_Price to (nAmnt * nQty)
+    End_Procedure
+
+    // when entering the price field we may wish to update the
+    // current field value with the standard unit price from the
+    // Invt file. Only do this if the current amount is zero. If non
+    // zero we assume the field is being edited (and we make no assumptions). 
+    Procedure Entering_Price Integer Field# Number nAmnt
+        Handle hoInventoryDD
+        Boolean bHasRecord
+        
+        Get Data_Set Inventory.File_Number to hoInventoryDD
+        
+        If (hoInventoryDD) Begin
+            Get HasRecord of hoInventoryDD to bHasRecord
+            If (nAmnt = 0) Begin
+               Get File_Field_Current_Value File_Field Inventory.Unit_Price to nAmnt
+               Set Field_Changed_Value Field# to nAmnt
+               Send Adjust_Display_Total
+            End
+        End            
+    End_Procedure
+
+End_Class

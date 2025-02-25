@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"  "http://www.wapforum.org/DTD/wml_1.1.xml">
+<!-- Wml-sample-1.wml
+     This is a sample of the simplest possible WML page. You can use a page like this to experiment with
+     various WML language commands.
+-->
+ <wml>
+     <card>
+       <p>
+          Hello there, Unwired World!
+        </p>
+      </card>
+</wml>
+
+
+
+
+
+
+
+
+
+
+

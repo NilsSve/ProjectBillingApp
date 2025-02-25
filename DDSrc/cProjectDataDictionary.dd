@@ -1,0 +1,169 @@
+﻿Use DataDict.pkg
+Use cRDCAutoCreateNewID.pkg
+Use TimeFunc.pkg
+
+Use cProjectRowsDataDictionary.dd
+Use cProjectRowsADataDictionary.dd
+Use cInvoiceHeaderDataDictionary.dd
+
+Open Inventory
+Open Customer
+Open InvoiceHeader
+Open InvoiceDetail
+Open Project
+
+Register_Object Project_sl
+
+Class cProjectDataDictionary is a DataDictionary
+    
+    Import_Class_Protocol cRDCAutoCreateNewIDMixin
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to Project.File_Number
+
+        Set Add_Client_File to ProjectRows.File_Number
+
+        Set Add_Server_File to Customer.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Prompt_Object Field Project.ID to Project_sl
+        Set Field_Option Field Project.ID DD_AUTOFIND to True
+
+        Set Field_Prompt_Object Field Project.Name to Project_sl
+        Set Field_Option Field Project.Name DD_AUTOFIND to True
+
+    End_Procedure
+
+    Procedure Creating
+        Integer iID
+        Forward Send Creating
+        Get AutoCreateNewID File_Field Project.ID True to iID
+    End_Procedure
+
+    Procedure RecalcTotalTime
+        String sTime sTotAmt
+        Integer iTotTime iTime iInt iPos iDecimalSep
+        Integer iID
+        Number nAmt nTotAmt
+        
+        Move 0 to iTotTime
+        Send Refind_Records
+        Move Project.ID to iID
+        Clear ProjectRowsA                             
+
+        Constraint_Set Self Delete
+        Constraint_Set Self
+        Constrain ProjectRowsA Relates to Project
+        Constrained_Find First ProjectRowsA by Index.2
+        While (Found and ProjectRowsA.ProjectID = iID)
+            Get StringTimeToDecimal ProjectRowsA.ElapsedTime to nAmt
+            Move (nAmt + nTotAmt) to nTotAmt
+            Constrained_Find gt ProjectRowsA by Index.2
+        Loop
+        Get_Attribute DF_DECIMAL_SEPARATOR to iDecimalSep
+        Move (Pos(Character(iDecimalSep), nTotAmt)) to iPos
+        Move (Left(nTotAmt, (iPos -1))) to sTotAmt
+        Get FormatDecimal nTotAmt (Length(sTotAmt)) 2 True to nTotAmt
+        Set Field_Changed_Value Field Project.TotTimeSpend to nTotAmt
+        Send Request_Save
+    End_Procedure   
+    
+    Procedure MarkProjectRowsAsInvoiced Integer iProject
+        Clear Project
+        Move iProject to Project.ID
+        Find eq Project by Index.1
+        If (Found = False) Begin
+            Send UserError "Project ID not found"
+            Procedure_Return
+        End                 
+        Clear ProjectRowsA
+
+        Constraint_Set Self Delete
+        Constraint_Set Self
+        Constrain ProjectRowsA Relates to Project
+        Constrained_Find First ProjectRowsA by Index.2
+        While (Found and ProjectRowsA.ProjectID = iProject)
+            Reread ProjectRowsA
+                Move 1 to ProjectRowsA.Invoiced
+                SaveRecord ProjectRowsA
+            Unlock
+            Constrained_Find gt ProjectRowsA by Index.2
+        Loop
+    End_Procedure
+
+    Procedure CreateOrderFromProject Integer iProject
+        String sTime
+        Number nAmt nQty
+        Integer iInvoiceNo
+        Handle hoDD
+        
+        Clear Customer
+        Clear Project
+        Move iProject to Project.ID
+        Find eq Project by Index.1
+        If (Found = False) Begin
+            Send UserError "Couldn't find projecct"
+            Procedure_Return
+        End                              
+        
+        Get Create (RefClass(cInvoiceHeaderDataDictionary)) to hoDD
+        Get AutoCreateNewID of hoDD File_Field InvoiceHeader.Invoice_Number True to iInvoiceNo
+        Relate Project  
+        Clear InvoiceHeader                                          
+        Move iInvoiceNo                 to InvoiceHeader.Invoice_Number
+        Move (CurrentDateTime())        to InvoiceHeader.Invoice_Date
+        Move Customer.Customer_Number   to InvoiceHeader.Customer_Number 
+        If (Trim(Customer.Item_ID) <> Trim(Inventory.Item_ID)) Begin
+            Send Destroy of hoDD
+            Send UserError "Could not find the default item ID. Please add a default inventory item for this customer!"
+            Procedure_Return
+        End
+        Lock 
+            SaveRecord InvoiceHeader
+        Unlock
+
+        Clear ProjectRowsA
+        Clear InvoiceDetail
+        Constraint_Set Self Delete
+        Constraint_Set Self
+        Constrain ProjectRowsA Relates to Project
+        Constrained_Find First ProjectRowsA by Index.2
+        While (Found = True) 
+            Reread  
+                Move InvoiceHeader.Invoice_Number  to InvoiceDetail.Invoice_Number
+                Move InvoiceHeader.Last_Detail_Num to InvoiceDetail.Detail_Number
+                Move Inventory.Item_ID             to InvoiceDetail.Item_ID
+                Move (Trim(String(ProjectRowsA.WorkDate)) * Trim(String(ProjectRowsA.Comment))) ;
+                    to InvoiceDetail.Comment   
+//                Move (Trim(ProjectRowsA.ElapsedTime))  to sTime
+                Get StringTimeToDecimal ProjectRowsA.ElapsedTime to nQty
+                Move nQty to InvoiceDetail.Qty_Ordered
+                Move Inventory.Unit_Price to InvoiceDetail.Price
+                Move (InvoiceDetail.Price * nQty)  to nAmt
+                Move nAmt to InvoiceDetail.Extended_Price
+//                Add nAmt to InvoiceHeader.Invoice_Total 
+//                Add nQty to InvoiceHeader.Invoice_Total_Qty_Ordered
+                Move (nQty + InvoiceHeader.Invoice_Total_Qty_Ordered) to InvoiceHeader.Invoice_Total_Qty_Ordered
+                Move (nAmt + InvoiceHeader.Invoice_Total)             to InvoiceHeader.Invoice_Total
+                Increment InvoiceHeader.Last_Detail_Num
+                SaveRecord InvoiceHeader
+                SaveRecord InvoiceDetail
+            Unlock                  
+            Clear InvoiceDetail
+            Constrained_Find Next
+        Loop
+        
+        Send Destroy of hoDD
+    End_Procedure
+
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+    Use Project.sl
+#ENDIF

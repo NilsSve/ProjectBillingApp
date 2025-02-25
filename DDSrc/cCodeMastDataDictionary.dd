@@ -1,0 +1,46 @@
+﻿Use Windows.pkg
+Use DataDict.pkg
+Use DDValTbl.pkg
+
+Open CodeMast
+Open CodeType
+
+// The DD files for codetype and codemnt must be manually
+// maintained. The DD reader in dbBldr and the Studio expects these 
+// two files to be available as utility files and so they are
+// already open. In addition, we must open these with
+// "open as" and not open.
+Class cCodemastDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        Set Main_File to CodeMast.File_Number
+
+        Set Add_Server_File to Codetype.File_Number
+
+        Set Status_Help Field CodeMast.Code to "Actual database code value for this type/category."
+
+        Set Status_Help Field CodeMast.Description to "Description of the database code value."
+    end_procedure
+
+    // Disallow blank codes
+    Function Validate_Save Returns Integer
+        Integer iRetVal
+        
+        Forward Get Validate_Save to iRetVal
+        If iRetVal Begin
+            Function_Return iRetVal
+        End
+        If (CodeMast.Code = '') Begin
+            Send UserError "Blank Code Values are not allowed." ""
+            Function_Return 1
+        End
+    End_Function
+
+    // This procedure is used To establish default field values.
+    procedure Field_Defaults
+        Forward Send Field_Defaults
+    End_Procedure 
+
+End_Class

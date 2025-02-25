@@ -1,0 +1,9 @@
+#REPLACE FILE41 InvoiceDetail
+#REPLACE InvoiceDetail.Recnum |FN41,0
+#REPLACE InvoiceDetail.Invoice_Number |FN41,1
+#REPLACE InvoiceDetail.Detail_Number |FN41,2
+#REPLACE InvoiceDetail.Item_ID |FS41,3
+#REPLACE InvoiceDetail.Qty_Ordered |FN41,4
+#REPLACE InvoiceDetail.Price |FN41,5
+#REPLACE InvoiceDetail.Extended_Price |FN41,6
+#REPLACE InvoiceDetail.Comment |FS41,7

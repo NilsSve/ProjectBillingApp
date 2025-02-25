@@ -1,0 +1,53 @@
+﻿Use Windows.pkg 
+Use DataDict.pkg
+Use Ddvaltbl.pkg
+
+Open Sysfile
+Open Inventory
+
+Register_Object SysFile_State_VT
+
+Object SysFile_State_VT is a CodeValidationTable
+    Set Type_Value to "STATES"
+    Set Static_State to False
+    Set Table_Title to "States"
+    Set Allow_Blank_State to True
+End_Object
+
+Class cSysfileDataDictionary  is a DataDictionary
+
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        Set Main_File To Sysfile.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_AUTOFIND to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+//        Set Foreign_Field_Option DD_INDEXFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        // Field-based properties.......................
+        Set Field_Class_Name Field SysFile.State  to "Combo"
+        Set Field_Label_Long Field SysFile.State  to "State"
+        Set Field_Label_Short Field SysFile.State to "St."
+        Set Field_Option Field SysFile.State DD_CAPSLOCK to True
+        Set Field_Value_Table Field SysFile.State to SysFile_State_VT
+        Set Status_Help Field SysFile.State to "Two letter state ID."
+
+
+        Set Field_Label_Long Field Sysfile.Bic to "Bank IdentifierCode"
+        Set Field_Label_Short Field Sysfile.Bic To "BIC"
+
+        Set Field_Label_Long Field Sysfile.Iban To "International Bank Account Number"
+        Set Field_Label_Short Field Sysfile.Iban To "IBAN"
+
+    End_Procedure
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Changed_Value Field Sysfile.State to "NA"
+    End_Procedure
+
+End_Class

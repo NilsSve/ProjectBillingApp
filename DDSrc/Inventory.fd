@@ -1,0 +1,6 @@
+#REPLACE FILE22 Inventory
+#REPLACE Inventory.Recnum |FN22,0
+#REPLACE Inventory.Item_ID |FS22,1
+#REPLACE Inventory.Description |FS22,2
+#REPLACE Inventory.Unit_Price |FN22,3
+#REPLACE Inventory.On_Hand |FN22,4

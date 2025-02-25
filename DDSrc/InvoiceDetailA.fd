@@ -1,0 +1,9 @@
+#REPLACE FILE45 InvoiceDetailA
+#REPLACE InvoiceDetailA.Recnum |FN45,0
+#REPLACE InvoiceDetailA.Invoice_Number |FN45,1
+#REPLACE InvoiceDetailA.Detail_Number |FN45,2
+#REPLACE InvoiceDetailA.Item_ID |FS45,3
+#REPLACE InvoiceDetailA.Qty_Ordered |FN45,4
+#REPLACE InvoiceDetailA.Price |FN45,5
+#REPLACE InvoiceDetailA.Extended_Price |FN45,6
+#REPLACE InvoiceDetailA.Comment |FS45,7

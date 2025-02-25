@@ -1,0 +1,7 @@
+#REPLACE FILE42 Project
+#REPLACE Project.Recnum |FN42,0
+#REPLACE Project.ID |FN42,1
+#REPLACE Project.CustomerID |FN42,2
+#REPLACE Project.Name |FS42,3
+#REPLACE Project.NextRowID |FN42,4
+#REPLACE Project.TotTimeSpend |FN42,5

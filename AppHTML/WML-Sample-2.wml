@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" "http://www.wapforum.org/DTD/wml_1.1.xml">
+<!-- Wml-sample-2.wml
+     This sample was created to give you an idea of what a WML report might look like. This uses the WML <select>
+     and <option> tags to create the report. You would rarely ever create a static page like this. Instead, you
+     would use WebApp to generate a report like this dynamically (which is exactly what the Wap Report wizard
+     does and is what the WapCustList sample does).
+     This page was created to give you an idea of what WML markup looks like.
+-->
+<wml>
+        <head>
+                <meta forua="true" http-equiv="Cache-Control" content="must-revalidate"/>
+        </head>
+        <card id="Rpt" newcontext="true">
+                <p align="center">
+                        <b>Wap Customer List</b>
+                </p>
+                <p mode="wrap">
+                        <select name="recid">
+                                <option value="13">3A Software</option>
+                                <option value="4">Ace Manufacturers, Inc.</option>
+                                <option value="16">All Canada Brewing Company</option>
+                                <option value="11">America West Hospital</option>
+                                <option value="2">American Products, Inc.</option>
+                                <option value="6">Big River Public Schools</option>
+                                <option value="1">Data Access Corporation</option>
+                                <option value="7">General Food Supplies</option>
+                                <option value="15">New Customer</option>
+                        </select>
+                        <br/>
+                        <do type="accept" label="Show">
+                                <go href="WapCustomerMaint.asp?RecId=$(recid)&amp;Index=2"/>
+                        </do>
+                        <do type="options" label="More..">
+                                <go href="/DAW.Examples.Web.WebAppSample10/WapCustList.asp?Rnd=494" method="post">
+                                        <postfield name="Action" value="RptRun"/>
+                                        <postfield name="Index" value="2"/>
+                                        <postfield name="Start" value="3"/>
+                                </go>
+                        </do>
+                        <do type="options" label="New Report">
+                                <go href="/DAW.Examples.Web.WebAppSample10/WapCustList.asp?Index=2"/>
+                        </do>
+                </p>
+        </card>
+</wml>
+
+
+
+

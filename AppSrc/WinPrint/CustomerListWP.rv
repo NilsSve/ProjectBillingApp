@@ -1,0 +1,329 @@
+﻿Use dfrptvw.pkg
+Use DataDict.pkg
+Use Windows.pkg
+Use cWinReport2.pkg
+Use cRDCHeaderGroup.pkg
+
+Use cCustomerDataDictionary.dd
+
+Deferred_View Activate_o1CustomerListWP for ;
+Object o1CustomerListWP is a ReportView
+    Set Label to "Print Customer"
+    Set Location to 6 6
+    Set Size to 137 236
+    Set Icon to "CustomerList.ico"
+    
+    Property Boolean pbComments False
+    // to control the zebra effect in the body of the report
+    Property Integer piLineWithBackgroundColor 2 
+        
+    Object oCustomerDataDictionary is a cCustomerDataDictionary
+    End_Object
+    
+    Set Main_DD to oCustomerDataDictionary
+    Set Server to oCustomerDataDictionary
+    
+    Object oCustomerList_grp is a cRDCHeaderGroup
+        Set Size to 130 226
+        Set Location to 4 4
+        Set Label to "Report Customer"
+        Set psNote to "Customer list report"
+        Set psImage to "CustomerList.ico"
+
+        Object oPrintTo is a RadioGroup
+            Set Size to 38 111
+            Set Location to 66 28
+            Set Label to "Send Report to"
+            Object oScreenRadio is a Radio
+                Set Label to "Report Viewer"
+                Set Size to 10 61
+                Set Location to 12 6
+                Set Status_Help to "Preview the report to screen"
+            End_Object
+            
+            Object oPrinterRadio is a Radio
+                Set Label to "Printer"
+                Set Size to 10 37
+                Set Location to 24 6
+                Set Status_Help to "Send the report to the default printer"
+            End_Object
+            
+            Function IsToPrinter Returns Boolean
+                Integer iRadio
+                Get Current_radio to iRadio
+                Function_Return (iRadio=1)
+            End_Function
+            
+        End_Object
+        
+        Object oOrder is a RadioGroup
+            Set Size to 29 111
+            Set Location to 31 28
+            Set Label to "Report Order"
+            Object oNumberRadio is a Radio
+                Set Label to "Number"
+                Set Size to 10 41
+                Set Location to 15 10
+                Set Status_Help to "Sort by customer number"
+            End_Object
+            
+            Object oNameRadio is a Radio
+                Set Label to "Name"
+                Set Size to 10 35
+                Set Location to 14 62
+                Set Status_Help to "Sort by customer name"
+            End_Object
+            
+            Function IsSortedByNumber Returns Boolean
+                Integer iRadio
+                Get Current_radio to iRadio
+                Function_Return (iRadio=1)
+            End_Function
+            
+        End_Object
+        
+        Object oCommentsCkBx is a CheckBox
+            Set Label to "Print Comments"
+            Set Size to 10 65
+            Set Location to 46 156
+            
+        End_Object
+        
+        Object oBtnPrint is a Button
+            Set Label to "Print"
+            Set Location to 73 156
+            
+            Procedure OnClick
+                Send StartReport
+            End_Procedure
+            
+        End_Object
+        
+        Object oBtnCancel is a Button
+            Set Label to "Close"
+            Set Location to 110 156
+            
+            Procedure OnClick
+                Send Close_Panel
+            End_Procedure
+            
+        End_Object
+        
+        Object oBtnPrinterSetup is a Button
+            Set Label to "Printer Setup"
+            Set Location to 90 156
+            
+            Procedure OnClick
+                Boolean bSetupOk
+                Get DFPrintSetupDialog of oReport to bSetupOk
+            End_Procedure
+            
+        End_Object
+        
+        Object oReport is a cWinReport2
+            Set Report_Title to "Customer List"
+            
+            // Set DDO, Index and breaks for the report
+            Set Server to oCustomerDataDictionary
+            Set Ordering to 1
+            
+            // Report_Breaks file.field // no breaks in this report
+            
+            Property Boolean pbLandscape False
+            
+            Function Starting_Main_Report Returns Integer
+                Integer iIndex
+                Boolean bOn bErr
+                
+                Send DFSetMetrics wpm_cm
+                Send DFSetmargins 1 1 1 1
+                
+                Get pbComments to bOn
+                Send DFSetLandscape (If(bOn,True,False))  // This can be used to force a page orientation
+                Get DFGetLandscape to bOn
+                Set pbLandscape to bOn
+                
+                Forward Get Starting_Main_Report to bErr
+                
+                Function_Return bErr
+            End_Function
+            
+            // Page_Top is printed first at the top margin of each page
+            Procedure Page_Top
+                String sFont
+                Integer iFontSize iStyle
+                
+                Move "arial" to sFont
+                Move 8 to iFontSize
+                Move (Font_Default) to iStyle
+                
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageTop
+                DFHeaderFrame Hdr_NoFrame
+                DFHeaderPos   Hdr_Left
+                DFWriteLn ("Page:" * "#pagecount#") iStyle
+                DFEndHeader
+                
+            End_Procedure
+            
+            Procedure Page_Header
+                Integer iFill iBorder iStyle
+                String  sFont sReportTitle
+                Integer iFontSize
+                
+                // reset when starting a new page
+                Set piLineWithBackgroundColor to 2
+                
+                Move "arial" to sFont
+                Move 16 to iFontSize
+                Move (Font_bold + rgb_White) to iStyle
+                Move (rgb_dGrey) to iFill
+                Move (rgb_dGrey) to iBorder
+                Get Report_Title to sReportTitle
+                
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageHeader
+                DFHeaderPos   Hdr_Left
+                DFHeaderFrame Hdr_Margins 0.01 iBorder iFill
+                DFWriteLnPos sReportTitle 0.1 iStyle
+                DFHeaderMargin HM_BottomOuter 0.08
+                DFEndHeader
+                
+            End_Procedure
+            
+            Procedure Page_Title
+                String  sFont
+                Integer iFontSize iHeaderStyle iFill iBorder
+                Boolean bOn
+                
+                Get pbLandscape to bOn
+                
+                Move "arial" to sFont
+                Move 8 to iFontSize
+                Move (Font_Bold + rgb_dBlue) to iHeaderStyle
+                Move (rgb_Grey) to iFill
+                Move (rgb_Grey) to iBorder
+                
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageTitle
+                DFHeaderPos   Hdr_Left
+                DFHeaderFrame Hdr_Margins 0 iBorder iFill
+                DFHeaderMargin HM_TopInner    0.01
+                DFHeaderMargin HM_BottomInner 0.01
+                DFHeaderMargin HM_BottomOuter 0.16
+                
+                DFWritePos "Number"                        0.1 (iHeaderStyle)
+                DFWritePos "Customer Name"                   2 (iHeaderStyle)
+                DFWritePos "Address"                         7 (iHeaderStyle)
+                DFWritePos "City"                           12 (iHeaderStyle)
+                DFWritePos "St."                            15 (iHeaderStyle)
+                DFWritePos "Zip"                            17 (iHeaderStyle)
+                
+                If bOn Begin
+                    DFWritePos "Comments"                    19 (iHeaderStyle)
+                End
+                DFWriteLn
+                DFEndHeader
+                
+            End_Procedure
+            
+            Procedure Body
+                String  sFont
+                Integer iFontSize iStyle
+                Boolean bOn
+                Integer iLine 
+                Integer iBackgroundColor iFontColor
+                
+                Send Update_Status (String(Customer.Customer_number))
+                
+                Get pbLandscape to bOn
+                
+                // set the current line font and background colors
+                Get piLineWithBackgroundColor to iLine
+                If (Mod(iLine, 2) = 0) Begin
+                    Move RGB_GREY to iBackgroundColor
+                    Move RGB_WHITE to iFontColor
+                End
+                Else Begin
+                    Move RGB_WHITE to iBackgroundColor 
+                    Move RGB_DGREY to iFontColor
+                End
+                Increment iLine 
+                Set piLineWithBackgroundColor to iLine          
+                          
+                Move "arial" to sFont
+                Move 8 to iFontSize
+                Move (font_default) to iStyle
+                
+                DFFont sFont
+                DFFontSize iFontSize
+                DFLineCheck 5
+                
+                // set the color of the line
+                DFWriteRect DFGR_CURRLINE 0.0 4.45 DFGR_RB_MARGIN RGB_WHITE 0.01 DFGR_NOWRAP iBackgroundColor
+                
+                // iFontColor will set the color of the font to go with the background for each line
+                DFWritePos Customer.Customer_Number       0.8 (iStyle + Font_Right + iFontColor) 0
+                DFWritePos Customer.Name                    2 (iStyle + iFontColor) -1 4.98
+                DFWritePos Customer.Address                 7 (iStyle + iFontColor) -1 4.98
+                DFWritePos Customer.City                   12 (iStyle + iFontColor) -1 3.98
+                DFWritePos Customer.State                  15 (iStyle + iFontColor) -1 0.98
+                DFWritePos Customer.Zip                    17 (iStyle + iFontColor) -1 1.98
+                
+                If bOn Begin
+                    DFWritePos Customer.Comments           19 (iStyle + iFontColor) -1 0
+                End
+                DFWriteLn
+            End_Procedure
+            
+            // Page_Bottom is printed last at the bottom margin of each page
+            Procedure Page_Bottom
+                String sFont
+                Integer iFontSize iBorder iStyle iFill
+                DateTime dtDT
+                
+                Move (CurrentDateTime()) to dtDT
+                
+                Move "arial" to sFont
+                Move 8 to iFontSize
+                Move (font_default) to iStyle
+                Move (rgb_dGrey) to iBorder
+                Move (rgb_White) to iFill
+                
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageBottom
+                DFHeaderFrame Hdr_Margins 0 iBorder iFill
+                DFHeaderPos Hdr_Center  // Write data in center
+                DFWriteLn ("Report Printed on" * String(dtDT)) (iStyle)
+                DFEndHeader
+                
+            End_Procedure
+            
+        End_Object
+        
+        Procedure StartReport
+            Boolean bToPrinter bComments bSortByNumber
+            
+            // determine if direct print
+            Get IsToPrinter of oPrintTo to bToPrinter
+            Set OutPut_Device_Mode of oReport to (If(bToPrinter, PRINT_TO_PRINTER, PRINT_TO_WINDOW))
+            
+            // determine if sort order is by number or name
+            Get IsSortedByNumber of oOrder to bSortByNumber
+            Set Ordering of oReport to (If(bSortByNumber, 2, 1))
+            
+            Get Checked_State of oCommentsCkBx to bComments
+            Set pbComments to bComments
+            
+            // run the report
+            Send Run_Report of oReport
+            
+        End_Procedure
+    
+    End_Object 
+
+Cd_End_Object

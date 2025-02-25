@@ -1,0 +1,441 @@
+﻿// ProjectRowsReport.rv
+// Hours Spend on Project Report
+Use Windows.pkg
+Use DFRptVw.pkg
+Use cWinReport2.pkg
+Use cRDCDbHeaderGroup.pkg
+Use cRDCDbForm.pkg
+
+Use cCustomerDataDictionary.dd
+Use cProjectDataDictionary.dd
+Use cProjectRowsDataDictionary.dd
+Use dfEntry.pkg
+
+Register_Object oReport
+
+Deferred_View Activate_oProjectReportWP for ;
+Object oProjectReportWP is a ReportView
+    Set Location to 6 6
+    Set Size to 158 223
+    Set Label to "Print Hours Spend"
+    Set Icon to "ProjectReport.ico"
+    
+    Object oCustomer_DD is a cCustomerDataDictionary
+    End_Object 
+
+    Object oProject_DD is a cProjectDataDictionary
+        Set DDO_Server to oCustomer_DD  
+    
+        Property Integer piProjectID 0
+        
+        Procedure OnConstrain       
+            If ((piProjectID(Self) <> 0)) Begin
+                Constrain Project.ID eq (piProjectID(Self))
+            End
+        End_Procedure
+
+    End_Object 
+
+    Object oProjectRows_DD is a cProjectRowsDataDictionary
+        Set DDO_Server To oProject_DD
+        Set Constrain_File To Project.File_Number
+        Set Auto_Fill_State to True
+    End_Object 
+
+    Set Main_DD to oProject_DD   
+    Set Server  to oProject_DD
+
+    Object oProjectHours_grp is a cRDCDbHeaderGroup
+        Set Size to 135 214
+        Set Location to 4 4
+        Set Label to "Billing Report"
+        Set psNote to "Select Invoice Number"
+        Set psImage to "Invoice.ico"
+        Set peAnchors to anTopLeftRight
+
+        Object oProjectID_fm is a cRDCDbForm 
+            Entry_Item Project.ID
+            Set Server to (Main_DD(Self))
+            Set Label to "Project ID"
+            Set Size to 13 40
+            Set Location to 43 70
+            Set Prompt_Object to (Project_sl(Self)) 
+            
+//            Procedure Refresh Integer iNotifyMode
+//                Integer iID
+//                Forward Send Refresh iNotifyMode
+//            
+//            End_Procedure
+            
+        End_Object
+
+        Object oPrintTo is a RadioGroup
+            Set Size to 38 118
+            Set Location to 66 28
+            Set Label to "Send Report to"
+    
+            Object oRadio1 is a Radio
+                Set Label to "Report Viewer"
+                Set Size to 10 61
+                Set Location to 12 6
+                Set Status_Help to "Prints the report to screen"
+            End_Object 
+    
+            Object oRadio2 is a Radio
+                Set Label to "Printer"
+                Set Size to 10 42
+                Set Location to 24 6
+                Set Status_Help to "Prints the report to printer"
+            End_Object 
+    
+            Function IsToPrinter Returns Boolean
+                Integer iRadio
+                Get Current_Radio to iRadio
+                Function_Return (iRadio=1)
+            End_Function 
+    
+        End_Object 
+
+        Object oBtnPrint is a Button
+            Set Label to "Print"
+            Set Location to 73 156
+            Set Status_Help to "Print the selected report"
+            Set Default_State to True
+            Procedure OnClick
+                Send StartReport
+            End_Procedure
+        End_Object 
+    
+        Object oBtnPrinterSetup is a Button
+            Set Label to "Printer Setup"
+            Set Location to 90 156
+            Set Status_Help to "Set up printer for report"
+            Procedure OnClick
+                Send DFPrintSetup of oReport
+            End_Procedure
+        End_Object 
+
+        Object oBtnCancel is a Button
+            Set Label to "Close"
+            Set Location to 114 156
+            Set Status_Help to "Close this Panel"
+            Procedure OnClick
+                Send Close_Panel
+            End_Procedure
+        End_Object 
+
+        Object oReport is a cWinReport2
+            Set Report_Title to "Report - Hours Spend on Project"
+            // Set DDO, Index and breaks for the report
+            Set Server to oProject_DD
+            Set Ordering to 1
+            Report_Breaks (SerializeRowId(GetRowId(Project.File_Number)))
+    
+            Object oReport2 is a cWinReport2
+                // Set DDO, Index and breaks for the report
+                Set Server to oProjectRows_DD
+                Set Ordering to 2
+                
+                Procedure Body 
+                    String  sFont 
+                    Integer iFontSize iStyle
+    
+                    Move "Courier New" to sFont
+                    Move 10 to iFontSize
+                    Move (font_default) to iStyle
+    
+                    DFFont sFont
+                    DFFontSize iFontSize
+    
+                    DFWritePos ProjectRows.WorkDate     0.08 iStyle -1  2.13
+                    DFWritePos ProjectRows.ElapsedTime  2.70 iStyle -1  2.81
+                    DFWritePos ProjectRows.Comment      4.10 iStyle -1 15.00
+                    DFWriteLn
+                    
+                End_Procedure 
+    
+            End_Object 
+    
+            Function Starting_Main_Report Returns Integer
+                Boolean bErr
+                Send DFSetMetrics wpm_cm
+                Send DFSetmargins 1 1 1 1
+                //Send DFSetLandscape false // This can be used to force a page orientation
+                Forward Get Starting_Main_Report to bErr
+                Function_Return bErr
+            End_Function 
+    
+            // Page_Top is printed first at the top margin of each page
+            Procedure Page_Top 
+                String  sFont
+                Integer iFontSize
+    
+                Move "Courier New" to sFont
+                Move 10 to iFontSize
+    
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageTop
+                    DFHeaderFrame Hdr_NoFrame
+                    DFHeaderPos   Hdr_Left
+                    DFWriteLn ("Page:" * "#pagecount#") (Font_Right)
+                DFEndHeader
+    
+            End_Procedure 
+    
+            // Report_Header is printed once in a report after Page_Top
+            //Procedure Report_Header
+            //    string  sFont
+            //    integer iFontSize
+            //    Move "Courier New" to sFont
+            //    Move 10 to iFontSize
+            //    DFFont sFont
+            //    DFFontSize iFontSize
+            //    DFBeginHeader  DFReportHeader
+            //        DFHeaderFrame  Hdr_Margins 0.01
+            //        DFHeaderPos    Hdr_Left
+            //        DFHeaderMargin HM_BottomOuter 0.08
+            //        DFWrite     "Report_Header" (Font_Bold+Font_Center)
+            //    DFEndHeader
+            //End_Procedure
+    
+            Procedure Page_Header 
+                Integer iFill iBorder iStyle
+                String  sFont sReportTitle
+                Integer iFontSize
+    
+                Move "Courier New" to sFont
+                Move 16 to iFontSize
+                Move (Font_bold + rgb_White) to iStyle
+                Move (rgb_dGrey) to iFill
+                Move (rgb_dGrey) to iBorder
+                Get Report_Title to sReportTitle
+                     
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageHeader
+                    DFHeaderPos   Hdr_Left
+                    DFHeaderFrame Hdr_Margins 0.01 iBorder iFill
+                    DFWriteLnPos sReportTitle 0.1 iStyle
+                    DFHeaderMargin HM_BottomOuter 0.08
+                DFEndHeader
+    
+                DFWriteLn
+            End_Procedure 
+    
+            // Page_Title appears on every page after Page_Header
+            //Procedure Page_Title
+            //    string  sFont
+            //    integer iFontSize
+            //    Move "Courier New" to sFont
+            //    Move 10 to iFontSize
+            //    DFFont sFont
+            //    DFFontSize iFontSize
+            //    DFBeginHeader  DFPageTitle
+            //        DFHeaderFrame  Hdr_Margins 0.01
+            //        DFHeaderPos    Hdr_Left
+            //        DFHeaderMargin HM_BottomOuter 0.08
+            //        DFWrite     "Page_Title" (Font_Bold+Font_Center)
+            //    DFEndHeader
+            //End_Procedure
+    
+            Procedure SubHeader1 
+                String  sFont 
+                Integer iFontSize iStyle
+                Integer iFill iBorder iHeaderStyle
+    
+                If (Page_end_State(Self)) Begin // Page_end_State must get set in subtotal 1
+                   Send DFNew_Page // this will force a new page
+                End
+    
+                Move "Courier New" to sFont
+                Move 10 to iFontSize
+                Move (font_bold) to iStyle
+                Move (Font_Bold + rgb_dBlue) to iHeaderStyle
+                Move (rgb_dGrey) to iBorder
+                Get DFGetDFColor 242 242 242 to iFill
+    
+                DFFont sFont
+                DFFontSize iFontSize    
+    
+                DFBeginHeader DFSubHeader 1
+                    String sValue
+                    
+                    DFHeaderLineCheck 5
+                    DFHeaderWrap   HDR_Wrap
+                    DFHeaderPos    HDR_Left
+                    DFHeaderFrame  Hdr_Margins 0.01 iBorder iFill
+                    DFHeaderMargin hm_BottomOuter 0.08
+                    DFHeaderMargin hm_TopInner    0.04
+                    DFHeaderMargin hm_BottomInner 0.04
+    
+                    // display fields to be placed in this sub-header
+                    DFWritePos "Customer Number:"            0.1 iHeaderStyle -1 4.9
+                    DFWritePos Customer.Customer_Number       5 iStyle -1
+                    DFWriteLn
+                    DFWritePos "Customer Name:"              0.1 iHeaderStyle -1 4.9
+                    DFWritePos Customer.Name                  5 iStyle -1
+                    DFWriteLn
+                    DFWritePos "Name:"                       0.1 iHeaderStyle -1 4.9
+                    DFWritePos Project.Name                   5 iStyle -1
+                    DFWriteLn
+                    DFWritePos "Tot Time Spend:"             0.1 iHeaderStyle -1 4.9
+                    
+                    Move Project.TotTimeSpend to sValue
+                    Get FormatIntegerTimeToText sValue to sValue
+                    DFWritePos sValue                         5 iStyle -1
+                    DFWriteLn
+    
+                    // write the heading for the body section
+                    DFFontSize 1 // create a very small space on top of and below the horizontal bar
+                    DFWriteLn
+                    DFWriteLine DFGR_CURRLINE DFGR_CURRLINE DFGR_RB_MARGIN DFGR_HORI iBorder
+                    DFWriteLn
+                    DFFontSize iFontSize
+                    DFWritePos "Date"    0.08 iHeaderStyle -1 2.13
+                    DFWritePos "Hours"   2.70 iHeaderStyle -1 2.81
+                    DFWritePos "Comment" 4.10 iHeaderStyle -1 2.81
+                    DFWriteLn
+    
+                DFEndHeader
+    
+                DFWriteLn
+                DFWriteLn
+            End_Procedure 
+    
+            Procedure SubTotal1 
+                // SubTotal section is not used
+    
+                Set Page_end_State to True // force a page-break when this section ends
+    
+            End_Procedure 
+    
+            // Totals appear at the end of the report before Report_Footer
+            //Procedure Total
+            //    string  sFont
+            //    integer iFontSize
+            //    Move "Courier New" to sFont
+            //    Move 10 to iFontSize
+            //    DFFont sFont
+            //    DFFontSize iFontSize
+            //    DFBeginHeader  DFTotal
+            //        DFHeaderFrame  Hdr_Margins 0.01
+            //        DFHeaderPos    Hdr_Left
+            //        DFHeaderMargin HM_BottomOuter 0.08
+            //        DFWrite     "Total" (Font_Bold+Font_Center)
+            //    DFEndHeader
+            //End_Procedure
+    
+            // Report_Footer is printed once on the last page before Page_Footer
+            //Procedure Report_Footer
+            //    string  sFont
+            //    integer iFontSize
+            //    Move "Courier New" to sFont
+            //    Move 10 to iFontSize
+            //    DFFont sFont
+            //    DFFontSize iFontSize
+            //    DFBeginHeader DFReportFooter
+            //        DFHeaderFrame  Hdr_Margins 0.01
+            //        DFHeaderPos    Hdr_Left
+            //        DFHeaderMargin HM_BottomOuter 0.08
+            //        DFWrite     "Report_Footer" (Font_Bold+Font_Center)
+            //    DFEndHeader
+            //End_Procedure
+    
+            // // Page_Footer is printed on each page before Page_Bottom
+            //Procedure Page_Footer
+            //    string  sFont
+            //    integer iFontSize
+            //    Move "Courier New" to sFont
+            //    Move 10 to iFontSize
+            //    DFFont sFont
+            //    DFFontSize iFontSize
+            //    DFBeginHeader DFPageFooter
+            //        DFHeaderFrame  Hdr_Margins 0.01
+            //        DFHeaderPos    Hdr_Left
+            //        DFHeaderMargin HM_BottomOuter 0.08
+            //        DFWrite     "Page_Footer" (Font_Bold+Font_Center)
+            //    DFEndHeader
+            //End_Procedure
+    
+    
+            // Page_Bottom is printed last at the bottom margin of each page
+            Procedure Page_Bottom 
+                String sFont
+                Integer iFontSize iBorder iStyle
+                DateTime dtDT
+    
+                Move (CurrentDateTime()) to dtDT
+    
+                Move "Courier New" to sFont
+                Move 10 to iFontSize
+                Move (font_default) to iStyle
+                Move (rgb_dGrey) to iBorder
+    
+                DFFont sFont
+                DFFontSize iFontSize
+                DFBeginHeader DFPageBottom
+                    DFHeaderFrame Hdr_Margins 0.01 iBorder
+                    DFHeaderPos Hdr_Left
+                    DFWriteLn ("Report Printed on" * String(dtDT)) (iStyle+Font_Center)
+                DFEndHeader
+    
+            End_Procedure 
+    
+            // Returns string with description of selection ranges
+            // Pass: Selection title, start value and end value. Return: description
+            Function SelectionCriteraDescription String sTitle String sStart String sStop Returns String
+                String sText
+                If (sStart=""  and sStop="") ;
+                    Function_Return ""
+                If (sStart="0" and sStop="0") ;
+                    Function_Return ""
+                If (sStart<>"" and sStop<>"") Begin
+                    Move ("between" * sStart * "and" * sStop) to sText
+                End
+                Else If (sStart > "") Begin
+                    Move ("starting at" * sStart) to sText
+                End
+                Else If (sStop > "") Begin
+                    Move ("up to" * sStop) to sText
+                End
+                Function_Return (sTitle * sText)
+            End_Function
+
+        End_Object 
+
+        Procedure StartReport 
+            Boolean bToPrinter
+    
+            Get IsToPrinter of oPrintTo to bToPrinter
+            Set OutPut_Device_Mode of oReport to (If(bToPrinter, PRINT_TO_PRINTER, PRINT_TO_WINDOW))
+            Send Run_Report of oReport
+        End_Procedure 
+
+    End_Object 
+
+    Procedure Entering_Scope Returns Integer
+        Integer iRetVal
+        Integer iID iIDLocal
+        Handle hoDD
+        
+        Forward Get msg_Entering_Scope to iRetVal 
+        Get piProjectID of ghoApplication to iID
+        If (iID <> -1) Begin
+            Move (Main_DD(Self)) to hoDD
+            Set piProjectID of hoDD to iID
+            Send Clear_All of hoDD
+            Move iID to Project.ID                          
+            Send Find of hoDD EQ 1
+            Send Request_Relate of hoDD
+        End
+        Procedure_Return iRetVal
+    End_Procedure
+    
+Cd_End_Object
+
+// General purpose access message
+Procedure StartProjectRowsReport Integer iProjectID
+    Set piProjectID of ghoApplication to iProjectID
+    Send Activate_oProjectReportWP
+End_Procedure

@@ -1,0 +1,85 @@
+<?xml-stylesheet type='text/xsl' href='customerxml.xsl'?>
+<CustomerList>
+        <Customer>
+                <Name>3A Software</Name>
+                <Number>13</Number>
+                <State>CA</State>
+        </Customer>
+        <Customer>
+                <Name>Ace Manufacturers, Inc.</Name>
+                <Number>4</Number>
+                <State>IL</State>
+        </Customer>
+        <Customer>
+                <Name>All Canada Brewing Company</Name>
+                <Number>24</Number>
+                <State>CA</State>
+        </Customer>
+        <Customer>
+                <Name>America West Hospital</Name>
+                <Number>11</Number>
+                <State>CA</State>
+        </Customer>
+        <Customer>
+                <Name>American Products, Inc.</Name>
+                <Number>2</Number>
+                <State>WA</State>
+        </Customer>
+        <Customer>
+                <Name>Big River Public Schools</Name>
+                <Number>6</Number>
+                <State>OR</State>
+        </Customer>
+        <Customer>
+                <Name>Data Access Worldwide</Name>
+                <Number>1</Number>
+                <State>FL</State>
+        </Customer>
+        <Customer>
+                <Name>General Food Supplies</Name>
+                <Number>7</Number>
+                <State>AZ</State>
+        </Customer>
+        <Customer>
+                <Name>New Customer</Name>
+                <Number>25</Number>
+                <State>HI</State>
+        </Customer>
+        <Customer>
+                <Name>Ortega Emergency Care Center</Name>
+                <Number>3</Number>
+                <State>TX</State>
+        </Customer>
+        <Customer>
+                <Name>Rectangle Service Center</Name>
+                <Number>9</Number>
+                <State>MD</State>
+        </Customer>
+        <Customer>
+                <Name>Stunning Software Corp.</Name>
+                <Number>12</Number>
+                <State>CA</State>
+        </Customer>
+        <Customer>
+                <Name>True Value Machine &amp; Tool Comp</Name>
+                <Number>5</Number>
+                <State>RI</State>
+        </Customer>
+        <Customer>
+                <Name>Wilson Bolt &amp; Nut Company</Name>
+                <Number>8</Number>
+                <State>GA</State>
+        </Customer>
+        <Customer>
+                <Name>Youth for Brass Springs, Inc.</Name>
+                <Number>10</Number>
+                <State>CO</State>
+        </Customer>
+        <Customer>
+                <Name>Zorro Cutlery</Name>
+                <Number>14</Number>
+                <State>CA</State>
+        </Customer>
+</CustomerList>
+
+

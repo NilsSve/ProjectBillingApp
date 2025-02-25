@@ -1,0 +1,11 @@
+#REPLACE FILE1 Invoice
+#REPLACE Invoice.Recnum |FN1,0
+#REPLACE Invoice.Invoice_Numer |FN1,1
+#REPLACE Invoice.Customer_Number |FN1,2
+#REPLACE Invoice.Invoice_Date |FD1,3
+#REPLACE Invoice.Terms |FS1,4
+#REPLACE Invoice.Ship_Via |FS1,5
+#REPLACE Invoice.Ordered_By |FS1,6
+#REPLACE Invoice.SalesPerson_ID |FS1,7
+#REPLACE Invoice.Invoice_Total |FN1,8
+#REPLACE Invoice.Last_Detail_Num |FN1,9

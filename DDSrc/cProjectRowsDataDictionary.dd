@@ -1,0 +1,67 @@
+﻿Use DataDict.pkg
+Use TimeFunc.pkg
+
+Open Project
+Open ProjectRows
+Open ProjectRowsA
+
+Set_Attribute DF_FILE_ALIAS of ProjectRows.File_Number  to DF_FILE_IS_MASTER
+Set_Attribute DF_FILE_ALIAS of ProjectRowsA.File_Number to DF_FILE_IS_ALIAS
+
+Class cProjectRowsDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to ProjectRows.File_Number
+
+        Set Add_System_File to ProjectRowsA.File_Number DD_Lock_On_New_Save
+
+        Set Add_Server_File to Project.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field ProjectRows.ID to File_Field Project.NextRowID
+
+        Set Field_Mask_Type Field ProjectRows.ElapsedTime to Mask_Time
+        Set Field_Mask Field ProjectRows.ElapsedTime to "hh:mm"  
+
+        Set Field_Mask_Type Field ProjectRows.WorkDate to Mask_Date_Window
+
+        Set Field_Class_Name Field ProjectRows.Invoiced to "Checkbox"
+        Set Field_Checkbox_Values Field ProjectRows.Invoiced to "1" "0"
+
+    End_Procedure   
+    
+    Procedure Creating
+        Forward Send Creating
+    End_Procedure
+    
+    Procedure Update
+        String sTime 
+        Number nAmt nTotAmt
+        
+        Get StringTimeToDecimal ProjectRows.ElapsedTime to nAmt
+        Move Project.TotTimeSpend to nTotAmt
+        Move (nTotAmt + nAmt) to Project.TotTimeSpend 
+    End_Procedure   
+    
+    Procedure Backout
+        String sTime 
+        Number nAmt nTotAmt
+        
+        Get StringTimeToDecimal ProjectRows.ElapsedTime to nAmt
+        Move Project.TotTimeSpend to nTotAmt
+        Move (nTotAmt - nAmt) to Project.TotTimeSpend 
+        
+    End_Procedure
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Changed_Value Field ProjectRows.WorkDate to (CurrentDateTime())
+        Set Field_Changed_Value Field ProjectRows.Invoiced to 0
+    End_Procedure  
+    
+End_Class

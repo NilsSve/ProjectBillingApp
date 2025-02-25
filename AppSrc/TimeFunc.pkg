@@ -1,0 +1,407 @@
+﻿//****************************************************************************
+// $Module type: Package
+// $Module name: TimeFunc
+// $Author     : Rune Göransson, Nils Svedmyr
+// Created     : 2009-02-12 @ 10:22
+//
+// Description : Global functions for ESQ Time 4
+//
+// $Rev History:
+//    2009-02-12 Module header created
+// $Rev History:
+//    2011-01-24  New functions added for getting the current DagSch record ID for an employee and Date.
+//                Named: SchemaID and SchemaDescription  
+//****************************************************************************
+Use gFormatNumbers.pkg
+
+// Calcs difference (iTime2 - iTime1), i.e. time span from iTime to iTime2  
+Function TimeSub Global Integer iTime1 Integer iTime2 Returns Integer
+    Integer iRetval 
+    Get TimeCalc 0 iTime1 iTime2 to iRetval
+    Function_Return iRetval
+End_Function
+ 
+// Calcs sum of two time spans, (iTime2 + iTime1) 
+Function TimeAdd Global Integer iTime1 Integer iTime2 Returns Integer
+    Integer iRetval 
+    Get TimeCalc 1 iTime1 iTime2 to iRetval
+    Function_Return iRetval
+End_Function
+ 
+// Calcs difference...time input  integer hhmm, output same format 
+// If iOpSign = 0 Returns difference (iTime2 - iTime1) as hhmm
+// If iOpSign = 1 Adds iTime1 + iTime2                       
+Function TimeCalc Global Integer iOpSign Integer iTime1 Integer iTime2 Returns Number
+    Integer iMin1 iMin2
+    Integer iRetVal
+    
+    If (iOpSign) Move (0 - iTime1) to iTime1
+    Move (((iTime1)-Mod((iTime1),100))*60/100+Mod((iTime1),100)) to iMin1
+    Move (((iTime2)-Mod((iTime2),100))*60/100+Mod((iTime2),100)) to iMin2
+    Move (((Integer((iMin2-iMin1)/60))*100 +(Mod((iMin2-iMin1),60))) ) to iRetval
+    Function_Return iRetVal
+End_Function     
+
+// Takes a time in integer format h..hmm 
+// and Returns a string "hh:mm"
+Function FormatIntegerTimeToText Global Integer iTime Returns String
+    String sRetVal
+    Integer iH iM 
+    Move (iTime / 100) to iH
+    Move (iTime - (iH * 100)) to iM
+    Move (String(iH) + ":" + (Right(String(100 + iM), 2))) to sRetVal
+    Function_Return sRetVal
+End_Function 
+
+Function TimeStringToInteger String sTime Returns Integer
+    Integer iTime  
+    
+    Move (Trim(sTime)) to sTime
+    Move (Replace(":", sTime, "")) to iTime
+    Function_Return iTime
+End_Function
+
+Function StringTimeToDecimal String sTime Returns Number
+    Number nDecimalMinutes nMinutes nDecimalTime                  
+    Integer iTime iHours iCh iPos 
+    String sRetval sOutTime sDec sSep
+    
+    Move ":" to sSep
+    Move (Pos(sSep, sTime)) to iPos
+    Move (Left(sTime, (iPos -1))) to iHours
+    Move (Mid(sTime, 2, (iPos +1))) to nMinutes
+    Move (nMinutes / 60) to nDecimalMinutes   
+    Move (Number(iHours) + Number(nDecimalMinutes)) to sOutTime
+
+    Get FormatDecimal sOutTime 2 2 True to sOutTime
+    Move sOutTime to nDecimalTime
+    
+    Function_Return nDecimalTime
+End_Function
+
+// Pass a decimal time value (hours and minutes),
+// Retturns a time in the format: HHHH:MM
+Function DecimalTimeToString Number nTime Returns String
+    Number nDecimalMinutes nMinutes nDecimalTime                  
+    Integer iTime iHours iCh iPos iSep
+    String sTime sRetval sOutTime sDec sSep
+    
+    If (nTime = 0) Begin
+        Function_Return ""
+    End                   
+
+    Move (String(nTime)) to sTime
+    Move (Pos(",", sTime )) to iPos
+    Move (Left(sTime, (iPos -1))) to iHours
+    Move (Mid(sTime, Length(sTime), iPos)) to nMinutes
+    Move (nMinutes * 60) to nDecimalMinutes
+    Move (Round(nDecimalMinutes)) to nDecimalMinutes
+    Get FormatNumber (nDecimalMinutes / 100) 2 to sDec
+    Move (Number(iHours) + String(sDec)) to sOutTime 
+    Get_Attribute DF_DECIMAL_SEPARATOR to iSep
+    Move (Character(iSep)) to sSep
+    Move (Replace(sSep, sOutTime, ":")) to sOutTime
+
+    Function_Return sOutTime
+End_Function
+
+//Function LongTimeString Global Integer iHr Integer iMn Integer iSe Returns String
+//    Function_Return (String(Right("0" + String(iHr), 2) + ":" + Right("0" + String(iMn), 2) + ":" + Right("0" + String(iSe), 2)))
+//End_Function
+
+Function ShortTimeString Global String sTime Returns String
+    String sHr sMn
+    Integer iPos
+
+    Move (Pos(",", sTime)) to iPos
+    If iPos Begin
+        Move (Left(sTime, (iPos - 1))) to sHr
+        Move (Replace((sHr + ","), sTime, "")) to sMn 
+        Function_Return (String(Right("00" + String(sHr), 2) + ":" + Left(String(sMn) + "00", 2)))
+    End 
+    Else If (Trim(sTime) <> "") Begin
+        Move (Trim(sTime)) to sTime
+        If (Length(sTime) = 1) Move ("0" + sTime) to sTime
+        Function_Return (sTime + ":00")
+    End 
+
+    Else  Function_Return ""
+End_Function
+
+Function ShortTimeString2 Global String sTime Returns String
+    String sHr sMn
+    Integer iPos
+    
+    Move (Pos(",", sTime)) to iPos
+    If iPos Begin
+        Move (Left(sTime, (iPos - 1))) to sHr
+        Move (Replace((sHr + ","), sTime, "")) to sMn 
+        Function_Return (String( sHr + ":" + Left(String(sMn) + "00", 2)))
+    End 
+    Else If (Trim(sTime) <> "") Begin
+        Move (Trim(sTime)) to sTime
+        Function_Return (sTime + ":00")
+    End 
+
+    Else  Function_Return ""
+End_Function
+
+// Takes a string as argument.
+// Returns: True if all is numeric.
+//          False if string contains any other than digits.
+Function IsNumeric Global String sValue Returns Boolean
+    Boolean bOk
+    Integer iLen iCount
+    String sChar
+
+    Move (Trim(sValue))   to sValue
+    Move (Length(sValue)) to iLen
+    If not iLen Function_Return False
+    Move (True) to bOk
+    For iCount from 1 to iLen
+        Move (Mid(sValue, 1, iCount)) to sChar
+        If (not("-0123456789" contains sChar)) Move (False) to bOk
+        If (not(bOk)) Break
+    Loop
+    Function_Return bOk
+End_Function  
+
+// This function does round a numeric value based on a given rounding
+// position using strings to avoid the usual problems with capacity of
+// integers that are used with the DataFlex ROUND function.
+Function RoundDecimal String sData Integer iDecimalSeparatorPos Integer iRoundPos Returns String
+    Integer iDigit
+
+    If ((iRoundPos - 1) = iDecimalSeparatorPos) Begin
+        Decrement iRoundPos
+    End
+    Move (Mid (sData, 1, iRoundPos - 1)) to iDigit
+    Increment iDigit
+    If (iDigit = 10) Begin
+        Move (Overstrike ("0", sData, iRoundPos - 1)) to sData
+        If ((iRoundPos - 2) = iDecimalSeparatorPos) Begin
+            Decrement iRoundPos
+        End
+        Get RoundDecimal sData iDecimalSeparatorPos (iRoundPos - 1) to sData
+    End
+    Else Begin
+        If (iRoundPos <= 1) Begin
+            Move (String (iDigit) + sData) to sData
+        End
+        Else Begin
+            Move (Overstrike (iDigit, sData, iRoundPos - 1)) to sData
+        End
+    End
+
+    Function_Return sData
+End_Function
+
+// This function does format a numeric value by using a new developed RoundDecimal function.
+// Too large values will be returned with asterisk. Numbers can be preceeded with prefix zeroes.
+Function FormatDecimal Real rInputVal Integer iWholeDigits Integer iDecimals Boolean bPrefixWithZeroes Returns String
+    String sData sDecimalSeparator
+    Integer iDecimalSeparator iDecimalSeparatorPos iRoundPos
+
+    If (iDecimals < 0 or iDecimals > 8) Begin
+        Error DFERR_OPERATOR "Number of decimals must be between 0 and 8"
+        Function_Return sData
+    End
+
+    If (iWholeDigits < 0 or iWholeDigits > 15) Begin
+        Error DFERR_OPERATOR "Number of digits before the decimal separator must be between 0 and 14"
+        Function_Return sData
+    End
+
+    Get_Attribute DF_DECIMAL_SEPARATOR to iDecimalSeparator
+    Move (Character (iDecimalSeparator)) to sDecimalSeparator
+
+    Move rInPutVal to sData
+    Move (Pos (sDecimalSeparator, sData)) to iDecimalSeparatorPos
+    If (iDecimalSeparatorPos = 0) Begin
+        If (Length (sData) > iWholeDigits) Begin
+            Move (Repeat ("*", iWholeDigits)) to sData
+            Function_Return sData
+        End
+        If (iDecimals > 0) Begin
+            Move (sData + sDecimalSeparator) to sData
+            Move (Length (sData)) to iDecimalSeparatorPos
+        End
+    End
+    If (iDecimalSeparatorPos > 0) Begin
+        Move (iDecimalSeparatorPos + iDecimals + 1) to iRoundPos
+        If (Integer (Mid (sData, 1, iRoundPos)) >= 5) Begin
+            Get RoundDecimal sData iDecimalSeparatorPos iRoundPos to sData
+            Move (Pos (sDecimalSeparator, sData)) to iDecimalSeparatorPos
+        End
+    End
+    Move (Left (sData + Repeat ("0", iDecimals), iWholeDigits + iDecimalSeparatorPos + iDecimals)) to sData
+    If (rInputVal < 0) Begin
+        If (iDecimalSeparatorPos > 0) Begin
+            If (Left (sData, 1) = "-") Begin
+                Move (Right (sData, Length (sData) - 1)) to sData
+                Decrement iDecimalSeparatorPos
+            End
+            If (iDecimalSeparatorPos <= iWholeDigits) Begin
+                If (iDecimals > 0) Begin
+                    If (bPrefixWithZeroes) Begin
+                        Move ("-" - Right (Repeat ("0", iWholeDigits - 2) + Left (sData, iDecimalSeparatorPos), iWholeDigits) + Mid (sData, iDecimals, iDecimalSeparatorPos + 1)) to sData
+                    End
+                    Else Begin
+                        Move ("-" - Left (sData, iDecimalSeparatorPos) + Mid (sData, iDecimals, iDecimalSeparatorPos + 1)) to sData
+                    End
+                End
+                Else Begin
+                    If (bPrefixWithZeroes) Begin
+                        Move ("-" - Right (Repeat ("0", iWholeDigits - 2) + Left (sData, iDecimalSeparatorPos - 1), iWholeDigits - 1) + Mid (sData, iDecimals, iDecimalSeparatorPos + 1)) to sData
+                    End
+                    Else Begin
+                        Move ("-" - Left (sData, iDecimalSeparatorPos - 1) + Mid (sData, iDecimals, iDecimalSeparatorPos + 1)) to sData
+                    End
+                End
+            End
+            Else Begin
+                If (iDecimals > 0) Begin
+                    Move (Repeat ("*", iWholeDigits) + sDecimalSeparator + Repeat ("*", iDecimals)) to sData
+                End
+                Else Begin
+                    Move (Repeat ("*", iWholeDigits)) to sData
+                End
+            End
+        End
+        Else Begin
+            If (Left (sData, 1) = "-") Begin
+                Move (Right (sData, Length (sData) - 1)) to sData
+            End
+            If (bPrefixWithZeroes) Begin
+                Move ("-" - Right (Repeat ("0", iWholeDigits - 1) + sData, iWholeDigits)) to sData
+            End
+            Else Begin
+                Move ("-" - Right (sData, iWholeDigits)) to sData
+            End
+        End
+    End
+    Else Begin
+        If (iDecimalSeparatorPos > 0) Begin
+            If ((iDecimalSeparatorPos - 1) <= iWholeDigits) Begin
+                If (iDecimals > 0) Begin
+                    If (bPrefixWithZeroes) Begin
+                        Move (Right (Repeat ("0", iWholeDigits) + Left (sData, iDecimalSeparatorPos), iWholeDigits + 1) + Left (Right (sData, Length (sData) - iDecimalSeparatorPos), iDecimals)) to sData
+                    End
+                    Else Begin
+                        Move (Left (sData, iDecimalSeparatorPos) + Mid (sData, iDecimals, iDecimalSeparatorPos + 1)) to sData
+                    End
+                End
+                Else Begin
+                    If (bPrefixWithZeroes) Begin
+                        Move (Right (Repeat ("0", iWholeDigits) + Left (sData, iDecimalSeparatorPos - 1), iWholeDigits)) to sData
+                    End
+                    Else Begin
+                        Move (Left (Left (sData, iDecimalSeparatorPos - 1), iWholeDigits)) to sData
+                    End
+                End
+            End
+            Else Begin
+                Move (Repeat ("*", iWholeDigits) + sDecimalSeparator + Repeat ("*", iDecimals)) to sData
+            End
+        End
+        Else Begin
+            If (bPrefixWithZeroes) Begin
+                Move (Right (Repeat ("0", iWholeDigits) + sData, iWholeDigits)) to sData
+            End
+            Else Begin
+                If (Length (sData) > iWholeDigits) Begin
+                    Move (Repeat ("*", iWholeDigits)) to sData
+                End
+                Else Begin
+                    Move (Left (sData, iWholeDigits)) to sData
+                End
+            End
+        End
+    End
+
+    Function_Return sData
+End_Function
+
+Function TimeAsNumber Global Time tTime Returns Number
+    Function_Return ((DateGetHour(tTime)) + ((DateGetMinute(tTime)) / 100.0))
+End_Function
+
+// PadLeft
+// The character to pad is optional. If nothing, spaces are used.
+//
+// Sample:
+//   Move (PadLeft(45672,10,"0")) to sString  -> "0000045672"
+//
+Function PadLeft Global String sString Integer iLength String sOptChar Returns String
+    Function_Return (Repeat(If(Num_Arguments > 2, sOptChar, " "), iLength - Length(sString)) + sString)
+End_Function
+
+Function FirstDayInMonth Global Date dDate Returns Date
+    DateTime dtDate
+    Move dDate to dtDate
+    Move (DateSetDay(dtDate, 1)) to dtDate
+    Function_Return (Date(dtDate))
+End_Function
+
+Function LastDayInMonth Global Date dValue Returns Date
+    // TO save looking up how many days are in each month
+    // we just get the 1st of the next month, and subtract one ;-)
+    DateTime dtValue dtValueOrig
+    Integer  iDay  iMonth  iYear
+    Move dValue  to dtValue 
+    Move dtValue to dtValueOrig 
+    If (Date(dtValue) = 0) Begin
+        Move (CurrentDateTime()) to dtValue 
+    End
+    Move (DateGetDay(dtValue))   to  iDay
+    Move (DateGetMonth(dtValue)) to  iMonth
+    Move (DateGetYear(dtValue))  to  iYear
+    If ( iMonth = 12) Begin 
+        Move 1 to  iMonth 
+        Move ( iYear +1) to  iYear
+        Move (DateSetYear(dtValue, iYear)) to dtValue // Only need to set year, if it has changed.
+     End
+     Else Begin
+        Move ( iMonth +1) to  iMonth
+     End
+    
+    Move (DateSetDay(dtValue,1)) to dtValue 
+    Move (DateSetMonth(dtValue, iMonth)) to dtValue 
+    Move (Date(dtValue) -1) to dtValue // the minus 1 steps back to the end of the previous month
+        
+    If (dtValue = dtValueOrig) Begin 
+        // Previous step found same starting value, must have been last day of month
+        // Force Jump 
+        Move (Date(dtValue ) +1) to dtValue 
+        Move (DateGetDay(dtValue)) to  iDay
+        Move (DateGetMonth(dtValue)) to  iMonth
+        Move (DateGetYear(dtValue)) to  iYear
+        If ( iMonth = 12) Begin 
+            Move 1 to  iMonth 
+            Move ( iYear +1) to  iYear
+            Move (DateSetYear(dtValue, iYear)) to dtValue // Only need to set year, if it has changed.
+         End
+         Else  Move ( iMonth +1) to  iMonth
+        
+        Move (DateSetDay(dtValue,1)) to dtValue 
+        Move (DateSetMonth(dtValue, iMonth)) to dtValue 
+        Move (Date(dtValue) -1) to dtValue
+    End
+    Function_Return (Date(dtValue))
+End_Function
+
+Function DateGetDaysInMonth Global DateTime dtDate Returns Integer
+    Integer iMth iYr iDays
+    Move (DateGetMonth(dtDate)) to iMth
+    If ("4,6,9" contains iMth or iMth = 11) Begin
+        Move 30 to iDays
+    End
+    Else If (iMth = 2) Begin
+        Move (DateGetYear(dtDate))       to iYr
+        Move (If(Mod(iYr,4) = 0 and (Mod(iYr,100) <> 0 or Mod(iYr,400) = 0),29,28)) to iDays
+    End
+    Else Begin
+        Move 31 to iDays
+    End
+    Function_Return iDays
+End_Function

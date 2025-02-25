@@ -1,0 +1,1301 @@
+CUSTOMER-IMPORT
+1
+Access Miles
+1400 NW 190 Ave
+Miami
+FL
+331766017
+305-555-0012
+305-555-0017
+customerservice@amiles.com
+18816,00
+205939,00
+10198,00
+Y
+2
+American Products, Inc.
+12314 Portland Ave., N.E.
+Redmond
+WA
+980522350
+425-555-7518
+425-555-7519
+sales@americanprodinc.com
+20714,00
+270672,00
+14287,00
+Y
+3
+Ortega Emergency Care Center
+56789 SW 199th Street
+Dallas
+TX
+752340247
+972-555-8317
+972-555-8318
+ortegacenter@emergencycare.com
+21256,00
+167191,00
+7632,00
+Y
+4
+Ace Manufacturers, Inc.
+123 NorthEast Industrial Park
+Peoria
+IL
+61605
+309-555-3215
+309-555-3216
+ami@acemanfinc.com
+1013,00
+87759,00
+0,00
+Y
+5
+True Value Machine & Tool Comp
+7654 City Center Blvd
+Warwick
+RI
+02886
+401-555-8579
+401-555-8580
+truevalue@hotmail.com
+11691,00
+141591,00
+1299,00
+N
+6
+Big River Public Schools
+P.O. Box 331
+Salem
+OR
+97301
+503-555-7516
+503-555-7517
+bigriver@publicschools.edu
+51333,00
+371149,00
+20860,00
+Y
+7
+General Food Supplies
+4444 Park Ave.
+Tucson
+AZ
+805705
+520-555-8173
+520-555-8174
+help@generalfoodsupplies.com
+12365,00
+124201,00
+6471,00
+Y
+8
+Wilson Bolt & Nut Company
+P.O. BOX 456 nnn
+Atlanta
+GA
+30303
+404-555-7294
+404-555-7295
+wilsonbolt@nutcompany.com
+60892,00
+411420,00
+17592,00
+N
+9
+Rectangle Service Center
+Route 12, Box 4444
+Columbia
+MD
+210467682
+410-555-7518
+410-555-7519
+helpcenter@rectanglesrvc.com
+5634,00
+41085,00
+3670,00
+Y
+10
+Youth for Brass Springs, Inc.
+P.O. Box 789
+Denver
+CO
+80204
+303-555-9573
+303-555-9574
+margie@youthforbrass.com
+35853,00
+312585,00
+30246,00
+Y
+11
+America West Hospital
+P.O. Drawer 3333
+San Diego
+CA
+654320000
+619-555-1873
+619-555-1874
+admin@americawesthospital.com
+6764,00
+59774,00
+4044,00
+Y
+12
+Stunning Software Corp.
+9876 N. Dakota St.
+Fresno
+CA
+93703
+559-555-1313
+559-555-1314
+tech@stunsftwr.com
+15184,00
+156964,00
+4387,00
+Y
+13
+3A Software
+1600 Technology Circle
+La Mesa
+CA
+91914
+619-555-5246
+619-555-5247
+3asoftware@yahoo.com
+16383,00
+191676,00
+7051,00
+Y
+14
+Zorro Cutlery
+12121 SE 12th Street
+San Diego
+CA
+92154
+619-555-4137
+619-555-4138
+info@zorrocutl.com
+13318,00
+72979,00
+7539,00
+Y
+15
+Automotive Parts
+78550 NW 64th Street
+Miami
+FL
+33168
+305-555-1244
+305-555-1245
+info@autoparts.net
+0,00
+0,00
+0,00
+N
+16
+San Carlos Brewing Company
+1111 Main Ave
+San Carlos
+CA
+94070
+650-555-8475
+650-555-8476
+sales@sancarlosbrew.net
+0,00
+408,00
+0,00
+Y
+17
+Addie Record & Boutique
+5948 Saint Stephens Road
+Eight Mile
+AL
+36613
+251-555-5803
+251-555-5804
+addierecordboutique@aol.com
+0,00
+0,00
+0,00
+Y
+18
+Keyboard Kastle
+4433 South 98 Road
+Omaha
+NE
+68102
+402-555-9400
+402-555-9401
+keyboard@thekastle.com
+0,00
+0,00
+0,00
+Y
+19
+Butter Jukebox 3000
+1251 Sheridan Avenue
+Bronx
+NY
+10456
+718-555-8106
+718-555-8107
+music@butterjukebox.com
+0,00
+0,00
+0,00
+Y
+20
+Amplified Version
+8303 Dauphin St
+Mobile
+AL
+36606
+251-555-9488
+251-555-9489
+amplifiedversion@msn.com
+0,00
+0,00
+0,00
+Y
+21
+Brads & Nors
+2051 Summit Boulevard, Ste 180
+Birmingham
+AL
+35243
+205-555-0665
+205-555-0666
+barnesnoble@bellsouth.net
+0,00
+0,00
+0,00
+Y
+22
+Better Living Products
+10895 AL Highway 108
+Boaz
+AL
+35957
+256-555-1311
+256-555-1312
+betterlivingproducts@msn.com
+0,00
+0,00
+0,00
+Y
+23
+Ecol-Stripe LLC
+138 South Ocen Boulevard
+Boonville
+MO
+65201
+703-555-6522
+703-555-6523
+ecolstripe@companys.com
+0,00
+0,00
+0,00
+Y
+24
+Leader Construction Co
+9731 SW 39 Avenue
+Saint Peters
+MO
+63303
+636-555-9272
+636-555-9273
+leader@construct.com
+9269,00
+57173,00
+5912,00
+Y
+25
+Designer Fencing Company
+3333 Moreau Rd
+Columbia
+MO
+65201
+573-555-9209
+573-555-9210
+designerfencing@bellsouth.com
+0,00
+0,00
+0,00
+Y
+26
+Sr Howard Gutter & Supply
+4990 St Anthony Rd
+Celina
+OH
+45822
+419-555-4733
+419-555-4734
+howard@guttersupply.com
+2658,00
+15531,00
+1032,00
+Y
+27
+A New Leef
+PO Box 367
+Imperial
+NE
+69033
+308-555-5030
+308-555-5031
+you@newleef.com
+22722,00
+193199,00
+12661,00
+Y
+28
+Community Church Of Providence
+372 Waylnd Av
+Providence
+RI
+02906
+401-555-9388
+401-555-9389
+pastor@providencechurch.com
+17448,00
+143610,00
+7406,00
+Y
+29
+Karlson Thrift Store
+9415 Main Street
+Heavener
+OK
+74937
+918-555-4410
+918-555-4411
+karlson@thethriftstore.com
+3896,00
+64029,00
+1974,00
+Y
+30
+Eleven West
+2901 West Memorial Road
+Oklahoma City
+OK
+73134
+405-555-9510
+405-555-9511
+shoes@elevenwest.com
+1943,00
+8532,00
+1055,00
+Y
+31
+A-A-B Fashion Uniforms
+93245 East 28th Street
+Tulsa
+OK
+74114
+918-555-5500
+918-555-5501
+uniforms@aab.com
+1042,00
+14172,00
+756,00
+Y
+32
+Marathon Sports
+16954 Massachusetts Road
+Cambridge
+MA
+02138
+617-555-4561
+617-555-4562
+sportsstuff@marathon.com
+4618,00
+76437,00
+1129,00
+Y
+33
+Camiro's Athletic Soles
+920 Main Street
+Wakefield
+RI
+02879
+401-555-9353
+401-555-9354
+camiro@athleticsoles.com
+10689,00
+132092,00
+8488,00
+Y
+34
+Armando & Peter Shoe Repair
+11291 Postal Road
+Warwick
+RI
+02888
+401-555-1516
+401-555-1517
+armandoorpeter@shoerepair.com
+2692,00
+17773,00
+1858,00
+Y
+35
+Baby Gapster
+1 Providence Place
+Lincoln
+RI
+02886
+401-555-4433
+401-555-4434
+clothes@babygapster.com
+2259,00
+19101,00
+825,00
+Y
+36
+LaBecchio, Lois B. DDS
+1760 Wilson Blvd., Suite 100
+Arlington
+VA
+22209
+703-555-9225
+703-555-9226
+dentistry@labecchiolois.com
+1071,00
+16764,00
+609,00
+Y
+37
+Berkley Plaza Theatre
+Berkley Plaza Shop
+Martinsburg
+WV
+25401
+304-555-3039
+304-555-3040
+movies@berkleyplaza.com
+270,00
+4500,00
+45,00
+Y
+38
+One Tradeshow Shop.com, Inc
+3802 Hummingbird Rd
+Wausau
+WI
+54401
+888-555-8070
+888-555-8071
+onetradeshow@internet.com
+23590,00
+121800,00
+11021,00
+Y
+39
+500 Plus News Magazine
+128 Cottonwood Avenue
+Hartland
+WI
+53029
+262-555-3675
+262-555-3676
+500plus@newsmagazine.com
+0,00
+0,00
+0,00
+Y
+40
+WISH Radio Station
+1312 North Pearla Street
+Berlin
+WI
+54923
+920-555-3611
+920-555-3612
+wishradio@stations.com
+0,00
+0,00
+0,00
+Y
+41
+National Information Systems
+120 Back Street
+Beaver Dam
+WI
+53916
+920-555-8872
+920-555-8873
+nationalinfosys@systems.com
+10688,00
+139142,00
+8007,00
+Y
+42
+Excel & Achiev Driver Services
+11900 West 44th Avenue
+Wheat Ridge
+CO
+80033
+303-555-9428
+303-555-9429
+driving@services.com
+5863,00
+46690,00
+3194,00
+Y
+43
+B V Telecommunications
+3905 Concord Pike
+Wilmington
+DE
+19803
+302-555-4783
+302-555-4784
+bv@telecommunications.com
+1350,00
+8862,00
+1008,00
+Y
+44
+Homebizz Sound
+1945 North Hunter Forge Road
+Newark
+DE
+19713
+302-555-7387
+302-555-7388
+sound@homebizz.com
+5152,00
+17615,00
+3495,00
+Y
+45
+Professional Video Sales Inc
+3705 Concord Pike
+Wilmington
+DE
+19803
+302-555-4783
+302-555-4784
+videosales@pros.com
+0,00
+0,00
+0,00
+Y
+46
+210 On Clark
+210 West Clark Street
+Champaign
+IL
+61820
+217-555-3598
+217-555-3599
+210@clubs.com
+1399,00
+8011,00
+932,00
+Y
+47
+Mechanics 0505
+3090 South 51st West
+Rexburg
+ID
+83440
+208-555-3560
+208-555-3561
+mechanics@0505.com
+9391,00
+187586,00
+6675,00
+Y
+48
+Century 20 Chrysler
+PO Box 988
+Blackfoot
+ID
+83221
+208-555-7851
+208-555-7852
+chrysler@century20.com
+3800,00
+30908,00
+2455,00
+Y
+49
+B & H Copiers Inc
+1557 East 66th Street
+Brooklyn
+NY
+11234
+718-555-2411
+718-555-2412
+bhcopiersinc@bellsouth.com
+42042,00
+206601,00
+18570,00
+Y
+50
+Mahony Anndrew H MD
+9107 Collins Avenue
+Middlebury
+VT
+05753
+802-555-3883
+802-555-3884
+drmahony@mds.com
+978,00
+5521,00
+402,00
+Y
+51
+Bean & Company Contracting Inc
+758 Fort Avenue
+Sheridan
+WY
+82801
+307-555-6747
+307-555-6748
+beancontracting@contracts.com
+974,00
+12658,00
+646,00
+Y
+52
+Walkman's Supply
+1302 E Lincoln Road
+Alcoa
+TN
+37701
+865-555-9827
+865-555-9828
+walkmanssupply@bellsouth.net
+8155,00
+143720,00
+1695,00
+Y
+53
+Professional Carpet Care
+87019 SW 89 Circle Suite 100
+Knoxville
+TN
+37902
+865-555-5734
+865-555-5735
+carpetcare@pros.com
+570,00
+4275,00
+342,00
+Y
+54
+Creative Notions
+3191 Dynasty Rd
+District Heigh
+MD
+20774
+301-555-5688
+301-555-5689
+creativenotions@msn.com
+43572,00
+309843,00
+30930,00
+Y
+55
+Dyana Body Gym
+1907 W Washington Ave
+Lovington
+NM
+88260
+505-555-3962
+505-555-3963
+dyana@bodygym.com
+1180,00
+42775,00
+295,00
+Y
+56
+Capital Racquet Center
+3290 South 15th Street
+Bismark
+ND
+58503
+701-555-2216
+701-555-2217
+raquetcenter@thecap.com
+1770,00
+33925,00
+1180,00
+Y
+57
+Eidisoon's Florist
+8535 Parallel Parkway
+Kansas City
+KS
+66112
+913-555-2998
+913-555-2999
+eidisoon@allflorist.com
+0,00
+0,00
+0,00
+Y
+58
+Larry's Fine Wines
+5373 Mill Way
+New Bedford
+MA
+02740
+508-555-9996
+508-555-9997
+larrysfinewiners@liq.com
+0,00
+0,00
+0,00
+Y
+59
+SJ Storage
+1188 East State Road 140
+Valparaiso
+IN
+46385
+219-555-4625
+219-555-4626
+sjstorage@in.com
+23345,00
+205784,00
+15757,00
+Y
+60
+BONY Trading
+3197 Commercial Place
+Palisades Park
+NJ
+07650
+201-555-9441
+201-555-9442
+konytrading@tradezone.com
+0,00
+0,00
+0,00
+Y
+61
+Four Season's
+3347 Walnut Street
+Cincinnati
+OH
+45241
+513-555-7133
+513-555-7134
+fourseasons@imports.com
+1792,00
+26461,00
+224,00
+Y
+62
+Haly Many Fine Art
+Poipe Shopping Villa
+Koloa
+HI
+96756
+808-555-7422
+808-555-7423
+halymany@fineart.com
+941,00
+21952,00
+458,00
+Y
+63
+Packsaddle Hop Ranch
+RR 1 Box 290
+Rochelle
+TX
+76872
+325-555-4635
+325-555-4636
+packsaddlehop@ranches.com
+48,00
+1092,00
+12,00
+Y
+64
+Meagle Lease To Own
+3155 East 1400 South
+Logan
+UT
+84341
+435-555-7522
+435-555-7523
+leasetoown@meagles.com
+3613,00
+27016,00
+1722,00
+Y
+65
+Meriann Title Corp.
+5454 Michigan Ave
+La Porte
+IN
+46350
+219-555-3248
+219-555-3249
+meriann@titles.com
+2829,00
+28799,00
+1547,00
+Y
+66
+VKF Building Relocation
+24 Mount Hermon Road Frnt
+Scotts Valley
+CA
+95066
+831-555-4611
+831-555-4612
+vkf@books.com
+100,00
+1130,00
+55,00
+Y
+67
+Schoolastic Book Fairs
+250 Lisa Drive # D
+New Castle
+DE
+19720
+302-555-3221
+302-555-3222
+bookfaris@schoolastic.edu
+12212,00
+161440,00
+1961,00
+Y
+68
+Towne & County Motor Inn
+Route 5
+Gorham
+NH
+03581
+603-555-4663
+603-555-4664
+townecounty@motorinn.com
+0,00
+0,00
+0,00
+Y
+69
+R&S Reliable Service Air
+7661 State Road 557
+Polk City
+FL
+33868
+863-555-9561
+863-555-9562
+rs@reliableservice.com
+6653,00
+46953,00
+3744,00
+Y
+70
+Tameblyn Apartments
+1231 South Locust Street
+Manteno
+IL
+60950
+815-555-4683
+815-555-4684
+tameblyn@apartments.com
+116,00
+4466,00
+58,00
+Y
+71
+Rapido Release Bail Bonding
+1923 Ida Street Suite A
+Tupelo
+MS
+38801
+662-555-3658
+662-555-3659
+rapidorelease@bailbonds.com
+270,00
+3215,00
+40,00
+Y
+72
+Youngin's Beauty Supply Inc
+320 Howarde Street
+Greenwood
+MS
+38930
+662-555-4559
+662-555-4560
+baeutysupply@youngins.com
+4132,00
+31900,00
+2382,00
+Y
+73
+Hoffbenny & Associates
+2011 Central Avenue East
+Great Falls
+MT
+59404
+406-555-4532
+406-555-4533
+hoffbenny@bookkeeping.com
+0,00
+0,00
+0,00
+Y
+74
+Hamherst Country Club
+702 Poemah Road
+Amherst
+NH
+03031
+603-555-6739
+603-555-6740
+hamherst@golfing.com
+8069,00
+107891,00
+5476,00
+Y
+75
+Feasant Ridge Country Club
+140 Country Club Road
+Gilford
+NH
+03249
+603-555-7808
+603-555-7809
+feasantridge@countryclub.com
+366,00
+4413,00
+150,00
+Y
+76
+Idleyad Trading Post & Liquor
+29879 North Umpqua Highway
+Idleyld Park
+OR
+97447
+541-555-3404
+541-555-3405
+idleyad@msn.com
+65,00
+940,00
+25,00
+Y
+77
+Image Technology Corp
+9353 Southeast Alansa Drive
+Hubbard
+OR
+97032
+503-555-2223
+503-555-2224
+imagetech@hotmail.com
+26451,00
+316224,00
+19942,00
+Y
+78
+P & Dantro Co Inc
+1005 E Philadelphia St
+York
+PA
+17404
+717-555-6922
+717-555-6923
+pdantro@whereever.com
+3222,00
+30882,00
+1304,00
+Y
+79
+Ye Oldey Gun Shop
+3701 Hamilton Street
+New Bethlehem
+PA
+16242
+814-555-3813
+814-555-3814
+YeOldeyGunShop@msn.com
+224,00
+5600,00
+192,00
+Y
+80
+Yorkey Barbell Company
+3309 Board Street
+York
+PA
+17402
+717-555-6481
+717-555-6482
+yorkeybarbell@what.com
+9565,00
+68769,00
+4635,00
+Y
+81
+Commershial Bank Of Ozark
+280 North Merrick Avenue
+Ozark
+AL
+36360
+334-555-8731
+331-555-8732
+commbank@ozark.com
+0,00
+0,00
+0,00
+Y
+82
+A & B Car Rental-Baranof Motor
+1009 Sawmill Creek Road
+Sitka
+AK
+99835
+907-555-9228
+907-555-9229
+abcarrental@who.com
+6441,00
+53828,00
+2382,00
+Y
+83
+F & S Automotive
+6770 East Frier Drive Suite 10
+Glendale
+AZ
+85303
+623-555-9305
+623-555-9306
+fsautomotive@here.net
+0,00
+0,00
+0,00
+Y
+84
+Access Personnel Corp.
+2311 Wood St
+Texarkana
+TX
+75501
+903-555-9817
+903-555-9818
+accesspersonal@work.com
+0,00
+0,00
+0,00
+Y
+85
+A S A P Services
+1810 North Crossover Road
+Fayetteville
+AR
+72701
+479-555-0675
+479-555-0676
+asapservices@ummm.com
+2589,00
+27463,00
+493,00
+Y
+86
+A Child's Garden
+690 West Dunne Road
+Morgan Hill
+CA
+95037
+408-555-7787
+408-555-7788
+achildsgarden@eve.com
+0,00
+0,00
+0,00
+Y
+87
+Kennie & Associates Inc
+210 West 10th Street
+Loveland
+CO
+80537
+970-555-6305
+970-555-6306
+kennieassoc@work.com
+0,00
+0,00
+0,00
+Y
+88
+Topnotch Communications Inc
+1055 Stonewall Farms Rd
+Mahopac
+NY
+10541
+914-555-3504
+914-555-3505
+topnotchcomm@communicate.com
+0,00
+0,00
+0,00
+Y
+89
+Whalie Computer Associates
+51 Whalley Way
+Southwick
+MA
+01077
+413-555-5698
+413-555-5699
+whaliecomp@associates.com
+11737,00
+138992,00
+7166,00
+Y
+90
+Datalook
+4450 11th Avenue
+New York
+NY
+10001
+212-555-6891
+212-555-6892
+sales@datalook.com
+686,00
+9849,00
+637,00
+Y
+91
+Darieeno Computer
+10578 Postal Road
+Darien
+CT
+06820
+203-555-8675
+203-555-8676
+help@darieeno.com
+0,00
+0,00
+0,00
+Y
+92
+Utopeea Systems Corp
+1372 Old Forgie Road
+New Castle
+DE
+19801
+302-555-7707
+302-555-7708
+utopeeasystems@corps.com
+440,00
+6060,00
+400,00
+Y
+93
+Forte Mayer Construction
+2287 83rd Street Northwest
+Washington
+DC
+20001
+202-555-6953
+202-555-6954
+fortemayer@contruction.net
+0,00
+0,00
+0,00
+Y
+94
+Union Enterprise of Seminole
+4183 Central Park Circle
+Stanford
+FL
+32771
+407-555-3316
+407-555-3317
+unionenterprise@seminole.com
+3844,00
+32278,00
+1993,00
+Y
+95
+Provedence Christian Academy
+4595 Lawrenceville Hwy SW
+Lilburn
+GA
+30047
+770-555-2797
+770-555-2798
+staff@providencechristian.net
+341,00
+9671,00
+156,00
+Y
+96
+Korner Bakery Kafe
+305 West Monroe St
+Chicago
+IL
+60603
+312-555-3700
+312-555-3701
+kornerbakerykafe@who.net
+2796,00
+28812,00
+774,00
+Y
+97
+Raccoon Bait & Tackle-Shell Co
+RR 10 Box 191
+Rockville
+IN
+47872
+765-555-4185
+765-555-4186
+baitandtackle@supplies.com
+6675,00
+83315,00
+3994,00
+Y
+98
+La Avenida Mexican Store
+1606 B Ave W
+Oskaloosa
+IA
+52577
+641-555-7334
+641-555-7335
+mexicanstore@whoknows.com
+0,00
+0,00
+0,00
+Y
+99
+228 Fuel Express Pizzas & Food
+Hwys 228 & 28
+Floyd
+IA
+50435
+641-555-2387
+641-555-2388
+228fuelpizzafood@quickbite.com
+47534,00
+263771,00
+22855,00
+Y
+100
+Absoraka Cruise & Travel
+1173 15th Road
+Cody
+WY
+82414
+307-555-7020
+307-555-7021
+absorakacruisetravel@trips.net
+3245,00
+48120,00
+1840,00
+Y

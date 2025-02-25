@@ -1,0 +1,13 @@
+#REPLACE FILE40 InvoiceHeader
+#REPLACE InvoiceHeader.Recnum |FN40,0
+#REPLACE InvoiceHeader.Invoice_Number |FN40,1
+#REPLACE InvoiceHeader.Customer_Number |FN40,2
+#REPLACE InvoiceHeader.Invoice_Date |FD40,3
+#REPLACE InvoiceHeader.Terms |FS40,4
+#REPLACE InvoiceHeader.Ship_Via |FS40,5
+#REPLACE InvoiceHeader.Ordered_By |FS40,6
+#REPLACE InvoiceHeader.SalesPerson_ID |FS40,7
+#REPLACE InvoiceHeader.Invoice_Total |FN40,8
+#REPLACE InvoiceHeader.Last_Detail_Num |FN40,9
+#REPLACE InvoiceHeader.Payed_Date |FD40,10
+#REPLACE InvoiceHeader.Invoice_Total_Qty_Ordered |FN40,11
