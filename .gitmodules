@@ -1,0 +1,4 @@
+[submodule "Libraries/Libraries/DFAbout"]
+	path = Libraries/Libraries/DFAbout
+	url = https://github.com/NilsSve/Library-DFAbout.git
+	branch = main
