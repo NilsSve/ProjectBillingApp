@@ -19,13 +19,13 @@ loginEncryptionkey.inc
 
 # Data
 **/Data/**/*.log
-**/Data/**/*.dat
-**/Data/**/*.vld
-**/Data/**/*.k*
+#**/Data/**/*.dat
+#**/Data/**/*.vld
+#**/Data/**/*.k*
 **/Data/**/*.bad
-**/Data/**/*.hdr
+#**/Data/**/*.hdr
 **/Data/**/*.cch
-**/Data/**/*.cfg
+#**/Data/**/*.cfg
 
 # DDSrc
 **/DdSrc/**/*.def
