@@ -6,3 +6,5 @@ This tool is designed for programmers who run their own businesses. It simplifie
 Below is a sample image showcasing the `ProjectBilling.src` program:
 
 ![Sample image of the rogram](Bitmaps/ProjectBillingApp.png)
+
+![Sample Image](Customer80x80Dark.bmp)
