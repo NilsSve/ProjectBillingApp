@@ -7,4 +7,4 @@ Below is a sample image showcasing the `ProjectBilling.src` program:
 
 ![Sample image of the rogram](Bitmaps/ProjectBillingApp.png)
 
-Bitmaps/TestTools.bmp
+!Bitmaps/TestTools.bmp
