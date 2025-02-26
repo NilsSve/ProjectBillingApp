@@ -7,5 +7,5 @@ Below is a sample image showcasing the `ProjectBilling.src` program:
 
 ![Sample image of the rogram](Bitmaps/ProjectBillingApp.png)
 
-![Sample test Image](Customer80_80Dark.png)
-![Sample image](Bitmaps/Customer80_80.png)
+![Sample test Image](Bitmaps/Customer80_80Dark.png)
+![Sample image](Bitmaps/Customer80_80Dark.png)
