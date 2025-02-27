@@ -1,4 +1,5 @@
 ﻿Use DfAllent.pkg
+Use cRDCApplication.pkg
 Use cRDCCJCommandBarSystem.pkg
 
 Object oHtmlHelp is a cHtmlHelp
@@ -6,13 +7,12 @@ End_Object
 
 Register_Function phoTabWorkspace Returns Handle
 
-Object oApplication is a cApplication 
+Object oApplication is a cRDCApplication 
     Set peHelpType to htHtmlHelp 
     Set psProgram  to "ProjectBilling"
     Set psCompany  to "RDC Tools International"
     Set psProduct  to "Consultancy Billing System"
     
-    Property String psGridRowBackgroundColor
     Property Integer piToolbarIconSize 32
     Property Integer piProjectID -1 
     Property Integer piInvoiceID -1 
@@ -39,8 +39,8 @@ Object oApplication is a cApplication
             End 
             Set pbHaveSavedSplitter to True
         End
-    End_Procedure
-    
+    End_Procedure   
+
 End_Object     
 
 Use cRDCTooltipController.pkg
