@@ -1,19 +1,26 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 REM ===========================================================================
 REM  ProjectBillingApp - one-time setup
 REM
-REM  Run this once after cloning (and any time the Libraries\ folders look
-REM  empty or out of date, or a submodule has changed). It:
-REM    1. Downloads / updates the library submodules (DFAbout, DigitalCert,
-REM       DUF, RDCToolsLib, vwin32fh) to the exact versions this workspace
-REM       expects.
-REM    2. Configures THIS clone so a normal "git pull" keeps those libraries
-REM       in sync automatically from then on.
+REM  The libraries this workspace needs are NOT stored in this repository (see
+REM  .gitignore). This script provides them, and it behaves differently by
+REM  machine so that one arrangement serves both maintainer and user:
 REM
-REM  Nothing here is destructive: it only fetches libraries and sets one
-REM  local git option for this repository.
+REM    * If a shared RDC library pool sits next to this workspace (a sibling
+REM      ..\Libraries folder carrying the marker file .rdc-library-pool), it
+REM      makes Libraries\ a JUNCTION to that pool. One shared, editable copy:
+REM      a fix made in a library here is a fix in the pool.
+REM
+REM    * Otherwise it CLONES the libraries it needs (DFAbout, DigitalCert, DUF,
+REM      RDCToolsLib, vwin32fh) into this workspace's own Libraries\ folder -
+REM      isolated, self-contained, and it never writes anywhere outside this
+REM      workspace, so it cannot disturb libraries you already have elsewhere.
+REM      DUF is cloned from Library-DUF (the current framework repo; the old
+REM      DbUpdateFramework repo is superseded by it).
+REM
+REM  Re-run any time Libraries\ looks missing or out of date.
 REM ===========================================================================
 
 cd /d "%~dp0"
@@ -33,40 +40,47 @@ if errorlevel 1 (
     exit /b 1
 )
 
-git rev-parse --is-inside-work-tree >nul 2>nul
-if errorlevel 1 (
-    echo [ERROR] This folder is not a git repository.
-    echo         Clone ProjectBillingApp with GitHub Desktop or "git clone",
-    echo         then run setup.bat from the repository root.
-    echo.
-    pause
-    exit /b 1
+if exist "..\Libraries\.rdc-library-pool" (
+    REM ------------------------------------------------------------------ pool
+    if exist "Libraries" (
+        echo Libraries\ already present - assuming it is linked. Skipping.
+    ) else (
+        echo Shared library pool found next door - linking Libraries\ to it...
+        mklink /J "Libraries" "..\Libraries" >nul
+        if errorlevel 1 (
+            echo.
+            echo [ERROR] Could not create the junction to ..\Libraries.
+            echo         Create it by hand with:
+            echo             mklink /J "%CD%\Libraries" "%CD%\..\Libraries"
+            echo.
+            pause
+            exit /b 1
+        )
+        echo Linked: Libraries  -^>  ..\Libraries
+    )
+) else (
+    REM --------------------------------------------------------------- isolated
+    REM No shared pool. Clone the flat library set into this workspace's own
+    REM Libraries\ - never writes outside this workspace.
+    for %%N in (DFAbout DigitalCert DUF RDCToolsLib vwin32fh) do (
+        if not exist "Libraries\%%N\.git" (
+            echo Cloning %%N into Libraries\ ...
+            git clone https://github.com/NilsSve/Library-%%N.git "Libraries\%%N"
+            if errorlevel 1 (
+                echo.
+                echo [ERROR] Could not clone Library-%%N.
+                echo         Check your connection and that you can reach:
+                echo           https://github.com/NilsSve/Library-%%N.git
+                echo.
+                pause
+                exit /b 1
+            )
+        ) else (
+            echo Updating Libraries\%%N ...
+            git -C "Libraries\%%N" pull --ff-only
+        )
+    )
 )
-
-echo Synchronizing submodule definitions...
-git submodule sync --recursive
-
-echo.
-echo Downloading / updating library submodules ^(this may take a minute^)...
-git submodule update --init --recursive
-if errorlevel 1 (
-    echo.
-    echo [ERROR] One or more submodules could not be fetched.
-    echo         Check your internet connection and that you can reach:
-    echo           - https://github.com/NilsSve/Library-DFAbout.git
-    echo           - https://github.com/NilsSve/Library-DigitalCert.git
-    echo           - https://github.com/NilsSve/DbUpdateFramework.git
-    echo           - https://github.com/NilsSve/Library-RDCToolsLib.git
-    echo           - https://github.com/NilsSve/Library-vwin32fh.git
-    echo         Then run setup.bat again.
-    echo.
-    pause
-    exit /b 1
-)
-
-echo.
-echo Configuring this clone to keep libraries in sync on every "git pull"...
-git config submodule.recurse true
 
 echo.
 if exist "%~dp0skip-local-data.cmd" (
@@ -79,13 +93,9 @@ if exist "%~dp0skip-local-data.cmd" (
 echo.
 echo === Setup complete ===
 echo.
-echo The Libraries\ folder now holds DFAbout, DigitalCert, DUF, RDCToolsLib
-echo and vwin32fh at the versions this workspace expects. From now on a
-echo normal "git pull" (or Pull in GitHub Desktop) will also update these
-echo libraries automatically.
-echo.
-echo If a brand-new library/submodule is ever added, just run setup.bat once
-echo more to pick it up.
+echo Libraries\ is ready. Open ProjectBillingApp25.0.sws in the Studio and build.
+echo If Libraries\ is a junction to the shared pool, editing a library file here
+echo edits the pool - there is no separate copy to drift.
 echo.
 pause
 exit /b 0
