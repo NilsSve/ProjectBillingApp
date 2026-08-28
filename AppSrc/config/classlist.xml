@@ -4,11 +4,6 @@
 	<DFLibraryVersion>1</DFLibraryVersion>
 	<libraries>
 		<library>
-			<libraryPath>Libraries\DigitalCert\DigitalCert24.0.sws</libraryPath>
-			<libraryTimeStamp>2025-02-25T19:29:43</libraryTimeStamp>
-			<libraryID>Lib4</libraryID>
-		</library>
-		<library>
 			<libraryPath>Libraries\DFAbout\DFAbout24.0.sws</libraryPath>
 			<libraryTimeStamp>2025-02-25T19:28:00</libraryTimeStamp>
 			<libraryID>Lib1</libraryID>

@@ -9,7 +9,7 @@ Below is a sample image showcasing the `ProjectBilling.src` program:
 
 ## Setup after cloning
 
-The libraries this workspace uses (DFAbout, DigitalCert, DUF, RDCToolsLib, vwin32fh) are **not**
+The libraries this workspace uses (DFAbout, DUF, RDCToolsLib, vwin32fh) are **not**
 stored in this repository (they are gitignored). Run **`setup.bat`** once from the repository root
 and it provides them, behaving differently by machine so one arrangement serves both maintainer and
 user:
