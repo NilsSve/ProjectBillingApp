@@ -1,0 +1,58 @@
+// oTimeFunc-Tests.pkg - TimeFunc.pkg: times kept as an integer hhmm (845 is 8:45), the time between two of
+// them, two spans added, and the text forms.
+//
+// Not covered here: DecimalTimeToString and ShortTimeString look for a "," as the decimal separator, so their
+// result depends on the machine's number format.
+
+Use DFUnit\Fixturing\Fixture.pkg
+Use TimeFunc.pkg
+
+Object oTimeFunc_Tests is a cTestFixture
+    Set psTestFixtureName to "TimeFunc - hhmm times"
+
+    // From iTime1 to iTime2, as hhmm.
+    { Published=True }
+    Procedure Test_TimeSub
+        Send AssertIAreEqual 845 (TimeSub(830, 1715))  "8:30 to 17:15 is 8:45."
+        Send AssertIAreEqual 15  (TimeSub(1150, 1205)) "11:50 to 12:05 is 0:15, over the hour."
+        Send AssertIAreEqual 0   (TimeSub(900, 900))   "No time."
+    End_Procedure
+
+    // Two spans added, the minutes carried into the hours.
+    { Published=True }
+    Procedure Test_TimeAdd
+        Send AssertIAreEqual 415  (TimeAdd(130, 245))  "1:30 + 2:45 = 4:15."
+        Send AssertIAreEqual 1000 (TimeAdd(800, 200))  "Whole hours."
+        Send AssertIAreEqual 100  (TimeAdd(45, 15))    "0:45 + 0:15 = 1:00."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_FormatIntegerTimeToText
+        Send AssertSAreEqual "8:45"  (FormatIntegerTimeToText(845))  "8:45."
+        Send AssertSAreEqual "0:05"  (FormatIntegerTimeToText(5))    "Minutes only, two digits."
+        Send AssertSAreEqual "12:50" (FormatIntegerTimeToText(1250)) "More than half an hour past."
+        Send AssertSAreEqual "9:59"  (FormatIntegerTimeToText(959))  "The last minute of the hour."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_TimeStringToInteger
+        Integer iTime
+
+        Get TimeStringToInteger "8:45" to iTime
+        Send AssertIAreEqual 845 iTime "8:45."
+        Get TimeStringToInteger " 17:05 " to iTime
+        Send AssertIAreEqual 1705 iTime "Spaces round it."
+    End_Procedure
+
+    // Hours and minutes as hours with decimals: 8:30 is 8.5 hours.
+    { Published=True }
+    Procedure Test_StringTimeToDecimal
+        Number nHours
+
+        Get StringTimeToDecimal "8:30" to nHours
+        Send AssertNAreEqual 8.5 nHours "8:30."
+        Get StringTimeToDecimal "10:45" to nHours
+        Send AssertNAreEqual 10.75 nHours "Two-digit hours."
+    End_Procedure
+
+End_Object
